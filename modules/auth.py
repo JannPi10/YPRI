@@ -42,7 +42,8 @@ def login():
         print("[!] La contrasena no puede estar vacia.")
         contrasena = input("  Contrasena: ").strip()
 
-    # Busqueda secuencial en coleccion de usuarios
+    # GUIA 8 - ACTIVIDAD 6: Busqueda secuencial en el vector de usuarios
+    # [YA SE CUMPLIA]: Recorre el vector elemento por elemento comparando las claves
     for usuario in usuarios:
         if usuario["correo"] == correo and usuario["contrasena"] == contrasena:
             set_sesion_actual(usuario)

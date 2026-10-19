@@ -3,11 +3,15 @@
 SISTEMA YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
 Modulo: Catalogo, Publicacion, Busqueda y Modificacion de Servicios
 ========================================================================================
-Responsabilidades:
-- Visualizacion del catalogo completo y filtrado por ciudad, categoria o disponibilidad
-- Busqueda y detalle de servicios por identificador unico
-- Publicacion de nuevos servicios para prestadores
-- Modificacion de tarifas, descripcion y estado de disponibilidad
+GUIA 8 - VECTORES EN PYTHON: ALMACENAMIENTO, ORDENAMIENTO Y BUSQUEDA DE DATOS
+- Actividad 1 y 2: Vector unidimensional de servicios (lista de diccionarios) [YA EXISTIA]
+- Actividad 3: Recorrido secuencial de vector con ciclo for                  [YA EXISTIA]
+- Actividad 4: Ordenamiento ascendente con sorted() y funcion lambda        [NUEVO GUIA 8]
+- Actividad 5: Ordenamiento descendente con sorted(..., reverse=True)       [NUEVO GUIA 8]
+- Actividad 6: Busqueda secuencial por identificador unico ('codigo')       [YA EXISTIA]
+- Actividad 7: Busqueda secuencial por otros atributos (coincidencias)      [NUEVO GUIA 8]
+- Actividad 8: Integracion de busqueda y ordenamiento en menu interactivo   [NUEVO GUIA 8]
+- Actividad 13: Reto de integracion (minimo, maximo y metricas de vector)   [NUEVO GUIA 8]
 ========================================================================================
 """
 
@@ -16,6 +20,7 @@ from core.validaciones import (
     mostrar_encabezado,
     pedir_sn,
     pedir_float,
+    pedir_entero,
     pedir_categoria,
     pedir_ciudad,
     pedir_texto_minimo,
@@ -25,13 +30,30 @@ from core.validaciones import (
 from data.database import servicios, get_sesion_actual
 
 
-def listar_servicios(filtro_ciudad=None, filtro_categoria=None, solo_disponibles=False):
+# ========================================================================================
+# GUIA 8 - ACTIVIDAD 3: RECORRIDO DE VECTORES
+# Recorrido secuencial utilizando ciclo for sobre la lista (vector) de diccionarios.
+# YA SE CUMPLIA DESDE GUIAS ANTERIORES. Se documenta formalmente para Guia 8.
+# ========================================================================================
+
+def listar_servicios(filtro_ciudad=None, filtro_categoria=None, solo_disponibles=False, lista_personalizada=None):
     """
+    GUIA 8 - ACTIVIDAD 3: Recorrido de vectores.
     Recorre la lista de diccionarios de servicios y muestra la informacion tabular.
     Aplica filtros opcionales utilizando la instruccion 'continue' para omitir elementos.
+    Puede recibir una lista ordenada o filtrada (lista_personalizada).
     """
     mostrar_encabezado("CATALOGO DE SERVICIOS YPRI")
     print()
+
+    # GUIA 8: Determinar el vector a recorrer (el principal o uno ordenado/filtrado)
+    coleccion = lista_personalizada if lista_personalizada is not None else servicios
+
+    # GUIA 8 - ACTIVIDAD 9: Informar claramente si la coleccion esta vacia
+    if not coleccion:
+        print("  [!] No existen registros de servicios para mostrar.")
+        separador()
+        return
 
     if filtro_ciudad:
         print(f"  Filtro por ciudad: {filtro_ciudad}")
@@ -45,8 +67,9 @@ def listar_servicios(filtro_ciudad=None, filtro_categoria=None, solo_disponibles
     separador()
 
     mostrados = 0
-    for i, serv in enumerate(servicios):
-        # Filtros con instruccion continue
+    # GUIA 8 - ACTIVIDAD 3: Recorrido secuencial de vector con for
+    for i, serv in enumerate(coleccion):
+        # Filtros con instruccion continue (Guia 6 existente)
         if solo_disponibles and not serv["disponible"]:
             continue
         if filtro_ciudad and serv["ciudad"].lower() != filtro_ciudad.lower():
@@ -62,13 +85,63 @@ def listar_servicios(filtro_ciudad=None, filtro_categoria=None, solo_disponibles
         mostrados += 1
 
     separador()
-    print(f"Servicios mostrados: {mostrados} de {len(servicios)} registrados.")
+    # GUIA 8 - ACTIVIDAD 9: Informar cantidad de coincidencias
+    print(f"Servicios mostrados: {mostrados} de {len(coleccion)} en la vista actual.")
 
+
+# ========================================================================================
+# GUIA 8 - ACTIVIDAD 4: ORDENAMIENTO ASCENDENTE
+# Utiliza sorted() con funcion lambda para ordenar el vector por un atributo de menor a mayor.
+# ========================================================================================
+
+def ordenar_servicios_ascendente(criterio="tarifa_hora"):
+    """
+    GUIA 8 - ACTIVIDAD 4: Ordenamiento ascendente de un vector de diccionarios.
+    Criterios admitidos: 'tarifa_hora' (precio de menor a mayor), 'calificacion', 'codigo'.
+    Retorna un nuevo vector ordenado sin alterar la lista original.
+    """
+    # GUIA 8: sorted() con key=lambda para ordenar por clave de diccionario
+    servicios_ordenados = sorted(
+        servicios,
+        key=lambda s: s.get(criterio, 0)
+    )
+    return servicios_ordenados
+
+
+# ========================================================================================
+# GUIA 8 - ACTIVIDAD 5: ORDENAMIENTO DESCENDENTE
+# Utiliza sorted() con reverse=True para ordenar el vector por un atributo de mayor a menor.
+# ========================================================================================
+
+def ordenar_servicios_descendente(criterio="tarifa_hora"):
+    """
+    GUIA 8 - ACTIVIDAD 5: Ordenamiento descendente de un vector de diccionarios.
+    Criterios admitidos: 'tarifa_hora' (precio de mayor a menor), 'calificacion' (mejor calificados).
+    Retorna un nuevo vector ordenado en sentido inverso.
+    """
+    # GUIA 8: sorted() con reverse=True
+    servicios_ordenados = sorted(
+        servicios,
+        key=lambda s: s.get(criterio, 0),
+        reverse=True
+    )
+    return servicios_ordenados
+
+
+# ========================================================================================
+# GUIA 8 - ACTIVIDAD 6: BUSQUEDA SECUENCIAL POR IDENTIFICADOR UNICO
+# Recorre el vector comparando el codigo de servicio con el valor solicitado.
+# YA SE CUMPLIA DESDE GUIAS ANTERIORES. Se documenta formalmente para Guia 8.
+# ========================================================================================
 
 def ver_detalle_servicio():
     """
-    Consulta un servicio especifico mediante su codigo de identificacion.
-    Utiliza ciclo for con break al encontrar la coincidencia.
+    GUIA 8 - ACTIVIDAD 6: Busqueda secuencial en vector por identificador unico ('codigo').
+    1. Solicita el dato a buscar (codigo de servicio).
+    2. Recorre el vector secuencialmente con ciclo for.
+    3. Compara con == el identificador.
+    4. Muestra la informacion si existe coincidencia y termina con break.
+    5. Informa si no se encuentra el registro.
     """
     mostrar_encabezado("DETALLE DE SERVICIO")
     print()
@@ -81,10 +154,11 @@ def ver_detalle_servicio():
         return
 
     encontrado = False
+    # GUIA 8 - ACTIVIDAD 6: Busqueda secuencial elemento por elemento
     for serv in servicios:
         if serv["codigo"] == codigo:
             encontrado = True
-            print(f"\n  --- DETALLE DEL SERVICIO ---")
+            print(f"\n  --- DETALLE DEL SERVICIO ENCONTRADO ---")
             print(f"  Codigo:       {serv['codigo']}")
             print(f"  Prestador:    {serv['prestador_nombre']}")
             print(f"  Categoria:    {serv['categoria']}")
@@ -95,16 +169,196 @@ def ver_detalle_servicio():
             print(f"  Calificacion: {serv['calificacion']:.1f} *")
             print(f"  Contratos:    {serv['num_contratos']} realizados")
             separador()
-            break
+            break  # Detiene la busqueda al encontrar el registro unico
 
     if not encontrado:
-        print(f"\n[!] No se encontro ningun servicio con el codigo '{codigo}'.")
+        # GUIA 8: Mensaje claro cuando el registro no existe
+        print(f"\n[!] No existe un registro con el codigo '{codigo}'.")
 
+
+# ========================================================================================
+# GUIA 8 - ACTIVIDAD 7: BUSQUEDA POR OTROS ATRIBUTOS (COINCIDENCIAS MULTIPLES)
+# Recorre el vector buscando coincidencias por categoria, ciudad o texto descriptivo.
+# ========================================================================================
+
+def buscar_servicios_por_atributo():
+    """
+    GUIA 8 - ACTIVIDAD 7: Busqueda secuencial por atributos no unicos.
+    A diferencia de la busqueda por identificador, esta operacion puede
+    encontrar multiples registros que cumplan con la condicion.
+    Aplica operaciones de cadenas (.strip().lower()) para comparaciones insensibles a mayusculas.
+    """
+    mostrar_encabezado("BUSQUEDA DE SERVICIOS POR ATRIBUTO")
+    print()
+    print("  Criterios de busqueda disponibles:")
+    print("  1. Por Categoria (ej. Electricidad, Plomeria...)")
+    print("  2. Por Ciudad (ej. Cucuta, Cali, Bogota...)")
+    print("  3. Por Palabra clave en descripcion o nombre del prestador")
+    print("  0. Cancelar")
+    separador()
+
+    opcion = input("  Seleccione un criterio (0-3): ").strip()
+    if opcion == "0":
+        return
+
+    coincidencias = []  # GUIA 8: Vector de resultados coincidentes
+
+    if opcion == "1":
+        termino = input("  Ingrese la categoria a buscar: ").strip().lower()
+        # Busqueda secuencial con filtro de categoria
+        for s in servicios:
+            if termino in s["categoria"].lower():
+                coincidencias.append(s)
+
+    elif opcion == "2":
+        termino = input("  Ingrese la ciudad a buscar: ").strip().lower()
+        # Busqueda secuencial con filtro de ciudad
+        for s in servicios:
+            if termino in s["ciudad"].lower():
+                coincidencias.append(s)
+
+    elif opcion == "3":
+        termino = input("  Ingrese el texto o palabra clave a buscar: ").strip().lower()
+        # Busqueda secuencial en multiples campos de texto
+        for s in servicios:
+            if termino in s["descripcion"].lower() or termino in s["prestador_nombre"].lower():
+                coincidencias.append(s)
+    else:
+        print("\n[!] Opcion invalida.")
+        return
+
+    # GUIA 8 - ACTIVIDAD 9: Presentacion clara con cantidad de coincidencias
+    if coincidencias:
+        print(f"\n[OK] Se encontraron {len(coincidencias)} servicio(s) que coinciden con '{termino}':")
+        listar_servicios(lista_personalizada=coincidencias)
+    else:
+        print(f"\n[!] No se encontraron registros que cumplan con la busqueda: '{termino}'.")
+
+
+# ========================================================================================
+# GUIA 8 - ACTIVIDAD 13: RETO DE INTEGRACION
+# Metricas analiticas sobre el vector: menor valor, mayor valor, promedio y top ranking.
+# ========================================================================================
+
+def analisis_vector_servicios():
+    """
+    GUIA 8 - ACTIVIDAD 13: Reto de integracion.
+    Procesa el vector de servicios para extraer metricas de negocio reales:
+    - Servicio con menor valor (tarifa mas accesible)
+    - Servicio con mayor valor (tarifa premium)
+    - Tarifa promedio de la plataforma
+    - Servicio con mayor calificacion (reputacion destacada)
+    - Top 3 servicios mas contratados
+    """
+    mostrar_encabezado("ANALISIS Y METRICAS DEL VECTOR DE SERVICIOS")
+    print()
+
+    if not servicios:
+        print("  [!] No hay servicios registrados para analizar.")
+        return
+
+    # Calculos sobre el vector usando funciones nativas y expresiones lambda
+    mas_economico = min(servicios, key=lambda s: s["tarifa_hora"])
+    mas_costoso   = max(servicios, key=lambda s: s["tarifa_hora"])
+    mejor_rating  = max(servicios, key=lambda s: s["calificacion"])
+    tarifa_promedio = sum(s["tarifa_hora"] for s in servicios) / len(servicios)
+
+    # Ordenamiento para ranking top 3 contratos (Actividad 5 aplicada)
+    top_contratados = sorted(servicios, key=lambda s: s["num_contratos"], reverse=True)[:3]
+
+    print(f"  Total de servicios analizados en el vector: {len(servicios)}")
+    print(f"  Tarifa promedio general: ${tarifa_promedio:,.0f} COP/h")
+    separador()
+    print(f"  [+] SERVICIO MAS ECONOMICO:")
+    print(f"      {mas_economico['codigo']} - {mas_economico['categoria']} (${mas_economico['tarifa_hora']:,.0f}/h)")
+    print(f"      Prestador: {mas_economico['prestador_nombre']} ({mas_economico['ciudad']})")
+    print()
+    print(f"  [+] SERVICIO CON MAYOR VALOR:")
+    print(f"      {mas_costoso['codigo']} - {mas_costoso['categoria']} (${mas_costoso['tarifa_hora']:,.0f}/h)")
+    print(f"      Prestador: {mas_costoso['prestador_nombre']} ({mas_costoso['ciudad']})")
+    print()
+    print(f"  [+] SERVICIO MEJOR CALIFICADO:")
+    print(f"      {mejor_rating['codigo']} - {mejor_rating['categoria']} ({mejor_rating['calificacion']:.1f}* estrellas)")
+    print(f"      Prestador: {mejor_rating['prestador_nombre']}")
+    separador()
+    print("  [+] TOP 3 SERVICIOS MAS CONTRATADOS:")
+    for idx, s in enumerate(top_contratados, 1):
+        print(f"      {idx}. {s['codigo']} | {s['categoria']} | {s['prestador_nombre']} ({s['num_contratos']} contratos)")
+    separador()
+
+
+# ========================================================================================
+# GUIA 8 - ACTIVIDAD 8: INTEGRACION DE BUSQUEDA Y ORDENAMIENTO EN MENU
+# Menu interactivo que reune todas las operaciones de la guia sobre el vector.
+# ========================================================================================
+
+def menu_catalogo_avanzado():
+    """
+    GUIA 8 - ACTIVIDAD 8: Menu integrado de busqueda y ordenamiento.
+    Permite al usuario interactuar con el vector de servicios aplicando:
+    1. Recorrido estandar
+    2. Ordenamiento ascendente por precio
+    3. Ordenamiento descendente por precio
+    4. Ordenamiento descendente por calificacion (estrellas)
+    5. Busqueda secuencial por identificador
+    6. Busqueda secuencial por atributo no unico
+    7. Reto de integracion (metricas y analitica del vector)
+    0. Regresar
+    """
+    while True:
+        mostrar_encabezado("CATALOGO, ORDENAMIENTO Y BUSQUEDA (GUIA 8)")
+        print()
+        print("  1. Ver catalogo completo (orden original)")
+        print("  2. Ordenar por precio ASCENDENTE (menor a mayor)")
+        print("  3. Ordenar por precio DESCENDENTE (mayor a menor)")
+        print("  4. Ordenar por calificacion DESCENDENTE (mejores prestadores)")
+        print("  5. Buscar servicio por CODIGO (identificador unico)")
+        print("  6. Buscar servicios por ATRIBUTO (categoria, ciudad o texto)")
+        print("  7. Analisis de metricas del vector (reto de integracion)")
+        print("  0. Regresar al menu anterior")
+        separador()
+
+        op = input("  Seleccione una opcion (0-7): ").strip()
+
+        if op == "1":
+            listar_servicios()
+        elif op == "2":
+            print("\n  [i] Aplicando ordenamiento ascendente por tarifa...")
+            ordenados = ordenar_servicios_ascendente("tarifa_hora")
+            listar_servicios(lista_personalizada=ordenados)
+        elif op == "3":
+            print("\n  [i] Aplicando ordenamiento descendente por tarifa...")
+            ordenados = ordenar_servicios_descendente("tarifa_hora")
+            listar_servicios(lista_personalizada=ordenados)
+        elif op == "4":
+            print("\n  [i] Aplicando ordenamiento descendente por calificacion...")
+            ordenados = ordenar_servicios_descendente("calificacion")
+            listar_servicios(lista_personalizada=ordenados)
+        elif op == "5":
+            ver_detalle_servicio()
+        elif op == "6":
+            buscar_servicios_por_atributo()
+        elif op == "7":
+            analisis_vector_servicios()
+        elif op == "0":
+            break
+        else:
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 7.")
+
+        input("\n  Presione Enter para continuar...")
+        print()
+
+
+# ========================================================================================
+# FUNCIONALIDADES DE GESTION DE SERVICIOS (PUBLICAR Y MODIFICAR)
+# YA CUMPLIDAS EN GUIAS PREVIAS.
+# ========================================================================================
 
 def publicar_servicio():
     """
-    Permite a un usuario con rol 'prestador' o 'admin' registrar un nuevo servicio.
-    Almacena los datos en un diccionario y lo agrega a la lista general con .append().
+    GUIA 8 - ACTIVIDAD 1 y 2: Almacenamiento en vectores.
+    Permite registrar un nuevo servicio como diccionario y agregarlo
+    al vector 'servicios' mediante .append().
     """
     mostrar_encabezado("PUBLICAR NUEVO SERVICIO")
     print()
@@ -127,7 +381,7 @@ def publicar_servicio():
     ciudad = pedir_ciudad()
     disp_resp = pedir_sn("  ¿Disponibilidad inmediata? (s/n): ")
 
-    # Creacion del registro como DICCIONARIO
+    # Creacion del registro como DICCIONARIO dentro del vector
     nuevo_servicio = {
         "codigo": nuevo_codigo,
         "prestador_id": usuario_actual["id"],
@@ -141,13 +395,15 @@ def publicar_servicio():
         "num_contratos": 0
     }
 
+    # GUIA 8 - ACTIVIDAD 1.2: .append() sobre vector
     servicios.append(nuevo_servicio)
     print(f"\n[OK] Servicio '{nuevo_codigo}' publicado exitosamente.")
-    print(f"     Total de servicios en YPRI: {len(servicios)}")
+    print(f"     Total de servicios en el vector YPRI: {len(servicios)}")
 
 
 def modificar_servicio():
     """
+    GUIA 8 - ACTIVIDAD 1.2: Modificacion de un elemento en el vector.
     Permite modificar atributos de un servicio existente (descripcion, tarifa, disponibilidad).
     Verifica permisos: solo el prestador dueno o un admin pueden modificar.
     El identificador principal (codigo) permanece inmutable.
@@ -167,10 +423,10 @@ def modificar_servicio():
     if codigo is None:
         return
 
+    # GUIA 8: Busqueda secuencial en el vector
     servicio_encontrado = None
     for serv in servicios:
         if serv["codigo"] == codigo:
-            # Control de autorizacion por usuario
             if usuario_actual["rol"] != "admin" and serv["prestador_id"] != usuario_actual["id"]:
                 print("[!] Solo puede modificar los servicios publicados por usted.")
                 return
@@ -184,7 +440,6 @@ def modificar_servicio():
     print(f"\n  Servicio encontrado: {servicio_encontrado['codigo']} - {servicio_encontrado['categoria']}")
     print("  Deje vacio y presione Enter si desea conservar el valor actual.\n")
 
-    # Modificacion opcional de descripcion
     nueva_desc = input(f"  Descripcion [{servicio_encontrado['descripcion']}]: ").strip()
     if nueva_desc:
         if len(nueva_desc) < 10 or not any(c.isalpha() for c in nueva_desc):
@@ -192,7 +447,6 @@ def modificar_servicio():
         else:
             servicio_encontrado["descripcion"] = nueva_desc
 
-    # Modificacion opcional de tarifa
     while True:
         nueva_tarifa = input(f"  Tarifa/hora [${servicio_encontrado['tarifa_hora']:,.0f}] (Enter para conservar): ").strip()
         if nueva_tarifa == "":
@@ -207,7 +461,6 @@ def modificar_servicio():
         except ValueError:
             print("[!] Valor invalido. Ingrese solo numeros (ej. 35000) o Enter para conservar.")
 
-    # Modificacion opcional de disponibilidad
     while True:
         resp_disp = input(f"  ¿Disponible? (s/n) [{'s' if servicio_encontrado['disponible'] else 'n'}]: ").strip().lower()
         if resp_disp == "":

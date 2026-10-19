@@ -22,6 +22,7 @@ from modules.servicios import (
     ver_detalle_servicio,
     publicar_servicio,
     modificar_servicio,
+    menu_catalogo_avanzado,
 )
 from modules.contratos import (
     solicitar_servicio,
@@ -41,8 +42,8 @@ def menu_cliente():
 
         mostrar_encabezado(f"MENU CLIENTE — {usuario['nombre']}")
         print()
-        print("  1. Ver catalogo de servicios")
-        print("  2. Ver detalle de un servicio")
+        print("  1. Catalogo, busqueda y ordenamiento de servicios (Guia 8)")
+        print("  2. Ver detalle de un servicio por codigo")
         print("  3. Solicitar servicio (cotizacion y contrato)")
         print("  4. Ver mis contratos")
         print("  5. Calificar un servicio completado")
@@ -52,8 +53,7 @@ def menu_cliente():
         opcion = input("  Seleccione una opcion (0-5): ").strip()
 
         if opcion == "1":
-            resp_filtro = pedir_sn("  ¿Filtrar solo con disponibilidad inmediata? (s/n): ")
-            listar_servicios(solo_disponibles=(resp_filtro == "s"))
+            menu_catalogo_avanzado()
         elif opcion == "2":
             ver_detalle_servicio()
         elif opcion == "3":
@@ -156,17 +156,24 @@ def menu_admin():
 def main():
     """
     Punto de entrada principal.
-    Mantiene el ciclo while global hasta que el usuario elija salir del programa.
+    Permite operar en modo consola o abrir la interfaz grafica moderna (GUI).
     """
+    # Si se pasa --gui como argumento por linea de comandos, abrir GUI directamente
+    if len(sys.argv) > 1 and ("--gui" in sys.argv or "-g" in sys.argv):
+        from app_gui import main_gui
+        main_gui()
+        return
+
     while True:
         mostrar_encabezado("BIENVENIDO A YPRI")
         print()
-        print("  1. Iniciar sesion")
+        print("  1. Iniciar sesion (Modo Consola)")
         print("  2. Registrarse como nuevo usuario")
+        print("  3. Abrir Interfaz Grafica Moderna (GUI)")
         print("  0. Salir")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-2): ").strip()
+        opcion = input("  Seleccione una opcion (0-3): ").strip()
 
         if opcion == "1":
             if login():
@@ -180,13 +187,17 @@ def main():
         elif opcion == "2":
             registrar_usuario()
             input("\n  Presione Enter para continuar...")
+        elif opcion == "3":
+            print("\n  [i] Iniciando interfaz grafica moderna de YPRI...")
+            from app_gui import main_gui
+            main_gui()
         elif opcion == "0":
             print("\n  Gracias por utilizar YPRI.")
             print("  Conectando hogares con profesionales de confianza.")
             print()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese 1, 2 o 0.")
+            print("\n[!] Opcion invalida. Ingrese 1, 2, 3 o 0.")
 
         print()
 

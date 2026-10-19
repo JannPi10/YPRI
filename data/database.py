@@ -1,17 +1,18 @@
 """
 ========================================================================================
 SISTEMA YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
-Modulo: Base de Datos y Persistencia en Memoria (Colecciones de Diccionarios)
+Modulo: Base de Datos y Persistencia en Memoria (Vectores de Diccionarios)
 ========================================================================================
-Maneja las entidades del dominio representadas como listas de diccionarios mutables:
-- usuarios: cuentas registradas con roles diferenciados
-- servicios: ofertas publicadas por prestadores
-- contratos: acuerdos de servicio entre clientes y prestadores
-- calificaciones: retroalimentacion y puntuaciones por contrato completado
+GUIA 8 - VECTORES EN PYTHON: ALMACENAMIENTO, ORDENAMIENTO Y BUSQUEDA DE DATOS
+- Actividad 1 y 2: Implementacion de vectores (listas unidimensionales) en Python
+  donde cada posicion indexada (0, 1, 2...) almacena un registro de la entidad
+  representado como un diccionario con atributos estructurados.
+- Actividad 1.2: Almacenamiento dinamico mediante append() y consulta con len().
+[YA SE CUMPLIA DESDE GUIAS PREVIAS]: Se mantiene la coleccion existente sin duplicar.
 ========================================================================================
 """
 
-# LISTA de usuarios registrados (cada elemento es un DICCIONARIO)
+# GUIA 8 - VECTOR DE USUARIOS: lista unidimensional indexada de diccionarios
 usuarios = [
     {
         "id": "USR-001",
@@ -42,7 +43,8 @@ usuarios = [
     }
 ]
 
-# LISTA de servicios disponibles (cada elemento es un DICCIONARIO)
+# GUIA 8 - VECTOR DE SERVICIOS (ENTIDAD PRINCIPAL DE GUIA 8):
+# Vector unidimensional que almacena los registros de servicios publicados.
 servicios = [
     {
         "codigo": "SERV-01",
@@ -106,7 +108,7 @@ servicios = [
     }
 ]
 
-# LISTA de contratos generados (cada elemento es un DICCIONARIO)
+# GUIA 8 - VECTOR DE CONTRATOS: lista unidimensional de acuerdos y cotizaciones
 contratos = [
     {
         "id": "CONTR-101",
@@ -123,7 +125,7 @@ contratos = [
     }
 ]
 
-# LISTA de calificaciones registradas (cada elemento es un DICCIONARIO)
+# GUIA 8 - VECTOR DE CALIFICACIONES: lista unidimensional de resenas
 calificaciones = [
     {
         "id": "CALIF-001",
