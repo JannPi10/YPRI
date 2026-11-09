@@ -3,8 +3,21 @@
 SISTEMA YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
 Modulo: Utilidades y Validaciones Defensivas por Consola
 ========================================================================================
-Proporciona funciones para validar entradas de teclado y prevenir errores por
-datos vacios, tipos incorrectos, valores fuera de rango o formatos invalidos.
+DOCUMENTACION DE TEMAS POR SEMANAS:
+- [SEMANAS 5 Y 6 - CICLOS Y VALIDACIONES]:
+  * Ciclos 'while True' para bucles de captura con condiciones de salida 'break'.
+  * Sentencia 'continue' para reintentar cuando la entrada no cumple criterios.
+  * Manejo defensivo de excepciones con bloques 'try - except ValueError'.
+  * Validacion de rangos numericos enteros y decimales.
+- [SEMANA 7 - TUPLAS, CADENAS Y DICCIONARIOS]:
+  * Normalizacion de cadenas con metodos: .strip(), .lower(), .capitalize(), .upper().
+  * Validacion de pertenencia contra tuplas inmutables (CATEGORIAS_SERVICIO, CIUDADES).
+- [SEMANA 8 - VECTORES]:
+  * Validacion de existencia y prefijos de identificadores unicos en vectores (len, zfill).
+- [SEMANA 9 - MATRICES EN PYTHON: CREACION, RECORRIDO Y OPERACIONES]:
+  * Validacion defensiva para ingreso de celdas matriciales (Guia 9 - Seccion 2):
+    Control estricto de floats no negativos (valor >= 0) y capturas con try-except.
+  * Validacion de indices de fila [i] y columna [j] dentro de las dimensiones de la matriz.
 ========================================================================================
 """
 
@@ -31,7 +44,7 @@ def mostrar_encabezado(subtitulo="SISTEMA DE SERVICIOS A DOMICILIO"):
 
 def pedir_sn(prompt):
     """
-    Solicita al usuario una respuesta binaria (s/n).
+    [SEMANAS 5-6] Solicita al usuario una respuesta binaria (s/n).
     Rechaza numeros, cadenas vacias o palabras distintas.
     """
     while True:
@@ -43,7 +56,7 @@ def pedir_sn(prompt):
 
 def pedir_solo_letras(prompt, campo):
     """
-    Exige que el valor contenga al menos una letra alfabetica.
+    [SEMANAS 5-7] Exige que el valor contenga al menos una letra alfabetica.
     Rechaza valores vacios o formados unicamente por digitos/simbolos.
     """
     while True:
@@ -60,7 +73,7 @@ def pedir_solo_letras(prompt, campo):
 
 def pedir_entero(prompt, minimo, maximo):
     """
-    Valida que la entrada sea un entero dentro del rango [minimo, maximo].
+    [SEMANAS 5-6] Valida que la entrada sea un entero en el rango [minimo, maximo].
     Controla excepciones de tipo ValueError.
     """
     while True:
@@ -76,7 +89,7 @@ def pedir_entero(prompt, minimo, maximo):
 
 def pedir_float(prompt, minimo, maximo):
     """
-    Valida que la entrada sea un valor numerico decimal en el rango [minimo, maximo].
+    [SEMANAS 5-6] Valida que la entrada sea decimal en el rango [minimo, maximo].
     Controla excepciones de tipo ValueError.
     """
     while True:
@@ -90,9 +103,64 @@ def pedir_float(prompt, minimo, maximo):
             print("[!] Ingrese un valor numerico valido.")
 
 
+# ========================================================================================
+# [SEMANA 9 - GUIA 9]: VALIDACION ESPECIFICA PARA INGRESO DE VALORES EN MATRICES
+# Cumple el patron exacto ensenado en la Seccion 2 de la Guia de Aprendizaje N.º 9:
+# while True -> try float() -> if valor < 0: print(...) continue -> break -> except ValueError
+# ========================================================================================
+
+def pedir_valor_matriz_positivo(prompt="Valor: $"):
+    """
+    [SEMANA 9 - GUIA 9 ACTIVIDAD PRACTICA]:
+    Solicita un valor numerico decimal para una celda de matriz garantizando
+    que sea no negativo (>= 0) mediante control de excepciones y validacion logica.
+    """
+    while True:
+        try:
+            valor = float(input(prompt).strip())
+            if valor < 0:
+                print("[!] El valor no puede ser negativo.")
+                continue
+            return valor
+        except ValueError:
+            print("[!] Ingrese un valor numerico valido.")
+
+
+def pedir_coordenadas_matriz(total_filas, total_columnas, nombres_filas=None, nombres_columnas=None):
+    """
+    [SEMANA 9 - GUIA 9 ACCESO Y MODIFICACION INDEXADA]:
+    Solicita y valida de forma defensiva los indices [i] de fila y [j] de columna
+    para consultar o modificar un elemento especifico matriz[i][j].
+    Permite al usuario ingresar por numero (1 a N) convirtiendo a base 0.
+    """
+    print(f"\n  Dimensiones de la matriz: {total_filas} filas x {total_columnas} columnas")
+    
+    if nombres_filas:
+        print("  Filas disponibles:")
+        for idx, nom in enumerate(nombres_filas):
+            print(f"    [{idx + 1}] {nom}")
+    
+    fila_sel = pedir_entero(f"  Seleccione Fila (1 a {total_filas}, 0 para cancelar): ", 0, total_filas)
+    if fila_sel == 0:
+        return None, None
+    fila_idx = fila_sel - 1
+
+    if nombres_columnas:
+        print("  Columnas disponibles:")
+        for idx, nom in enumerate(nombres_columnas):
+            print(f"    [{idx + 1}] {nom}")
+
+    col_sel = pedir_entero(f"  Seleccione Columna (1 a {total_columnas}, 0 para cancelar): ", 0, total_columnas)
+    if col_sel == 0:
+        return None, None
+    col_idx = col_sel - 1
+
+    return fila_idx, col_idx
+
+
 def pedir_categoria():
     """
-    Muestra las categorias oficiales (Tupla CATEGORIAS_SERVICIO) y valida la eleccion.
+    [SEMANA 7] Muestra las categorias oficiales (Tupla CATEGORIAS_SERVICIO) y valida la eleccion.
     """
     print(f"  Categorias disponibles: {', '.join(CATEGORIAS_SERVICIO)}")
     while True:
@@ -104,7 +172,7 @@ def pedir_categoria():
 
 def pedir_ciudad():
     """
-    Muestra las ciudades de cobertura (Tupla CIUDADES_COBERTURA) y valida la entrada.
+    [SEMANA 7] Muestra las ciudades de cobertura (Tupla CIUDADES_COBERTURA) y valida la entrada.
     """
     print(f"  Ciudades disponibles: {', '.join(CIUDADES_COBERTURA)}")
     while True:
@@ -116,7 +184,7 @@ def pedir_ciudad():
 
 def pedir_correo(prompt):
     """
-    Valida que el correo electronico contenga estructura minima usuario@dominio.extension.
+    [SEMANA 7] Valida que el correo contenga estructura minima usuario@dominio.ext.
     """
     while True:
         correo = input(prompt).strip().lower()
@@ -131,7 +199,7 @@ def pedir_correo(prompt):
 
 def pedir_texto_minimo(prompt, campo, minimo=10):
     """
-    Solicita un texto descriptivo con longitud minima y al menos una letra.
+    [SEMANA 7] Solicita un texto descriptivo con longitud minima y al menos una letra.
     """
     while True:
         valor = input(prompt).strip()
@@ -146,9 +214,8 @@ def pedir_texto_minimo(prompt, campo, minimo=10):
 
 def pedir_id_registro(prompt, prefijo_esperado=None):
     """
-    Solicita un identificador de registro por consola.
+    [SEMANA 8] Solicita un identificador de registro por consola.
     Permite cancelar con '0' retornando None.
-    Valida prefijos esperados (ej. 'SERV', 'CONTR', 'USR').
     """
     while True:
         valor = input(prompt).strip().upper()
@@ -164,5 +231,5 @@ def pedir_id_registro(prompt, prefijo_esperado=None):
 
 
 def generar_id(prefijo, lista):
-    """Genera un identificador secuencial unico basado en la cantidad de registros."""
+    """[SEMANA 8] Genera un identificador secuencial unico basado en len(lista)."""
     return f"{prefijo}-{str(len(lista) + 1).zfill(3)}"

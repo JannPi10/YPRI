@@ -3,10 +3,20 @@
 SISTEMA YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
 Modulo: Autenticacion, Gestion de Usuarios y Control de Sesion
 ========================================================================================
-Responsabilidades:
-- Registro de nuevos usuarios con verificacion de correo unico
-- Autenticacion y validacion de credenciales
-- Control de sesion activa (cliente, prestador o administrador)
+DOCUMENTACION DE TEMAS POR SEMANAS:
+- [SEMANAS 5 Y 6 - CICLOS Y CONDICIONALES]:
+  * Verificacion de existencia de correo con ciclos for y comparaciones de igualdad.
+  * Bucle de captura con intentos y cancelacion controlada.
+- [SEMANA 7 - TUPLAS, CADENAS Y DICCIONARIOS]:
+  * Creacion de nuevos usuarios como diccionarios con claves estructuradas.
+  * Validacion de rol contra la tupla ROLES_SISTEMA ("cliente", "prestador", "admin").
+  * Normalizacion de correos con .strip().lower().
+- [SEMANA 8 - VECTORES EN PYTHON]:
+  * Almacenamiento dinamico del nuevo usuario en el vector usuarios[] usando .append().
+  * Generacion automatica de ID correlativo usando len(usuarios).
+- [SEMANA 9 - MATRICES EN PYTHON]:
+  * Segregacion de permisos: los administradores tienen acceso a la auditoria de matrices
+    y los clientes/prestadores a los reportes analiticos asociados.
 ========================================================================================
 """
 

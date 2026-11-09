@@ -3,15 +3,25 @@
 SISTEMA YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
 Modulo: Catalogo, Publicacion, Busqueda y Modificacion de Servicios
 ========================================================================================
-GUIA 8 - VECTORES EN PYTHON: ALMACENAMIENTO, ORDENAMIENTO Y BUSQUEDA DE DATOS
-- Actividad 1 y 2: Vector unidimensional de servicios (lista de diccionarios) [YA EXISTIA]
-- Actividad 3: Recorrido secuencial de vector con ciclo for                  [YA EXISTIA]
-- Actividad 4: Ordenamiento ascendente con sorted() y funcion lambda        [NUEVO GUIA 8]
-- Actividad 5: Ordenamiento descendente con sorted(..., reverse=True)       [NUEVO GUIA 8]
-- Actividad 6: Busqueda secuencial por identificador unico ('codigo')       [YA EXISTIA]
-- Actividad 7: Busqueda secuencial por otros atributos (coincidencias)      [NUEVO GUIA 8]
-- Actividad 8: Integracion de busqueda y ordenamiento en menu interactivo   [NUEVO GUIA 8]
-- Actividad 13: Reto de integracion (minimo, maximo y metricas de vector)   [NUEVO GUIA 8]
+DOCUMENTACION DE TEMAS POR SEMANAS:
+- [SEMANAS 5 Y 6 - CICLOS Y VALIDACIONES]:
+  * Recorrido con enumerate(coleccion), omision con sentencia 'continue',
+    bucles defensivos con try-except en captura de datos.
+- [SEMANA 7 - TUPLAS, CADENAS Y DICCIONARIOS]:
+  * Normalizacion de cadenas (.strip(), .title(), .lower()).
+  * Diccionarios mutables que almacenan cada registro de servicio.
+  * Tuplas inmutables (CATEGORIAS_SERVICIO, CIUDADES_COBERTURA).
+- [SEMANA 8 - VECTORES EN PYTHON]:
+  * Actividades 1 y 2: Vector unidimensional de servicios (lista de diccionarios).
+  * Actividad 3: Recorrido secuencial de vector con ciclo for y medicion len().
+  * Actividad 4: Ordenamiento ascendente con sorted() y funcion lambda.
+  * Actividad 5: Ordenamiento descendente con sorted(..., reverse=True).
+  * Actividad 6: Busqueda secuencial por identificador unico ('codigo').
+  * Actividad 7: Busqueda secuencial por otros atributos (coincidencias multiples).
+  * Actividad 8: Integracion de busqueda y ordenamiento en menu interactivo.
+  * Actividad 13: Reto de integracion (minimo, maximo, promedio y ranking Top 3).
+- [SEMANA 9 - MATRICES EN PYTHON]:
+  * Los servicios y sus categorias constituyen las filas analiticas de las matrices de YPRI.
 ========================================================================================
 """
 

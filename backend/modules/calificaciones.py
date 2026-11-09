@@ -3,11 +3,18 @@
 SISTEMA YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
 Modulo: Calificaciones, Resenas y Reputacion de Prestadores
 ========================================================================================
-Responsabilidades:
-- Registro de puntuaciones de 1.0 a 5.0 y comentarios por servicio recibido
-- Validacion de elegibilidad (solo contratos con estado 'Completado')
-- Prevencion de calificaciones duplicadas sobre el mismo contrato
-- Recalculo matematico del promedio acumulado de estrellas del servicio
+DOCUMENTACION DE TEMAS POR SEMANAS:
+- [SEMANAS 5 Y 6 - CICLOS Y VALIDACIONES]:
+  * Validacion de rango para puntuaciones flotantes (1.0 a 5.0 estrellas).
+  * Bucles de busqueda y comprobacion de estado previo ('Completado').
+- [SEMANA 7 - TUPLAS, CADENAS Y DICCIONARIOS]:
+  * Registros estructurados en diccionarios para cada resena con campos de fecha y texto.
+- [SEMANA 8 - VECTORES EN PYTHON]:
+  * Vector de calificaciones[] y vector de contratos[].
+  * Recalculo aritmetico del promedio ponderado en el vector de servicios.
+- [SEMANA 9 - MATRICES EN PYTHON]:
+  * Las calificaciones y contratos completados respaldan la confiabilidad de los datos
+    registrados en la matriz analitica de facturacion.
 ========================================================================================
 """
 

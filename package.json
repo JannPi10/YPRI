@@ -1,0 +1,13 @@
+{
+  "name": "semana-09-ypri",
+  "version": "1.0.0",
+  "description": "YPRI - Plataforma de Servicios a Domicilio - Guia 9 (Matrices)",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "start": "npm --prefix web run start"
+  },
+  "keywords": ["ypri", "matrices", "nextjs", "python"],
+  "author": "Jann Pierre Ortiz Zambrano & Josue David Rincon Palomino",
+  "license": "ISC"
+}

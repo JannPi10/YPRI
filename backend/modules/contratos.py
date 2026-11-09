@@ -3,11 +3,20 @@
 SISTEMA YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
 Modulo: Cotizaciones con IVA y Gestion de Contratos
 ========================================================================================
-Responsabilidades:
-- Cotizacion automatica de servicios con calculo aritmetico de IVA (19%)
-- Creacion de contratos vinculando clientes, prestadores y servicios
-- Consulta del historial de contratos segun el rol del usuario
-- Actualizacion controlada de estados segun la tupla ESTADOS_CONTRATO
+DOCUMENTACION DE TEMAS POR SEMANAS:
+- [SEMANAS 5 Y 6 - CICLOS Y OPERACIONES ARITMETICAS]:
+  * Calculo de horas trabajadas y multiplicacion por tarifa horaria.
+  * Calculo de IVA del 19% (IVA_PORCENTAJE) sumado al subtotal.
+  * Bucles interactivos para solicitud y seleccion de servicio disponible.
+- [SEMANA 7 - TUPLAS, CADENAS Y DICCIONARIOS]:
+  * Tupla inmutable ESTADOS_CONTRATO ("Pendiente", "En proceso", "Completado", "Cancelado").
+  * Registros estructurados como diccionarios con atributos clave-valor.
+- [SEMANA 8 - VECTORES EN PYTHON]:
+  * Vector unidimensional de contratos (lista de diccionarios contratos[]).
+  * Busqueda secuencial de contratos por id unico y por cliente_id / prestador_id.
+- [SEMANA 9 - MATRICES EN PYTHON]:
+  * Los contratos con estado 'Completado' alimentan la facturacion de las matrices
+    semanales y por ciudad mediante la funcion de sincronizacion.
 ========================================================================================
 """
 

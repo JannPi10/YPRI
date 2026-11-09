@@ -18,6 +18,11 @@ GUIA 8 - VECTORES EN PYTHON:
 
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
+import sys
+import os
+
+# Asegurar resolucion de modulos internos independientemente de la ruta de ejecucion
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Importacion de la arquitectura modular de YPRI
 from core.constantes import (
@@ -25,6 +30,7 @@ from core.constantes import (
     CATEGORIAS_SERVICIO,
     ESTADOS_CONTRATO,
     CIUDADES_COBERTURA,
+    DIAS_SEMANA_MATRIZ,
     IVA_PORCENTAJE,
 )
 from data.database import (
@@ -32,6 +38,9 @@ from data.database import (
     servicios,
     contratos,
     calificaciones,
+    matriz_ventas_semanales,
+    matriz_ventas_ciudades,
+    modificar_celda,
     get_sesion_actual,
     set_sesion_actual,
     limpiar_sesion,
@@ -39,6 +48,18 @@ from data.database import (
 from modules.servicios import (
     ordenar_servicios_ascendente,
     ordenar_servicios_descendente,
+)
+from modules.matrices import (
+    calcular_totales_filas,
+    calcular_totales_columnas,
+    calcular_total_general,
+    calcular_promedio_general,
+    analizar_rendimiento_matriz,
+    es_matriz_cuadrada,
+    crear_matriz_nula,
+    crear_matriz_identidad,
+    extraer_diagonal_principal,
+    sincronizar_matriz_con_contratos_reales,
 )
 
 
@@ -151,7 +172,7 @@ class YpriApp(tk.Tk):
 
         lbl_logo = tk.Label(
             brand_frame,
-            text="🛠️ YPRI",
+            text="YPRI",
             font=("Segoe UI", 20, "bold"),
             bg=self.c_sidebar,
             fg="#60A5FA"
@@ -192,12 +213,13 @@ class YpriApp(tk.Tk):
         # Botones de Navegacion
         self.nav_buttons = {}
         items_nav = [
-            ("catalogo", "🔍 Catálogo & Búsqueda", self._abrir_catalogo),
-            ("solicitar", "📝 Solicitar Servicio", self._abrir_solicitar),
-            ("contratos", "📋 Mis Contratos", self._abrir_contratos),
-            ("publicar", "➕ Publicar Servicio", self._abrir_publicar),
-            ("reto", "📊 Análisis de Vectores", self._abrir_reto),
-            ("admin", "🛡️ Panel Administrador", self._abrir_admin),
+            ("catalogo", "Catálogo & Búsqueda", self._abrir_catalogo),
+            ("matrices", "Matrices (Guía 9)", self._abrir_matrices),
+            ("solicitar", "Solicitar Servicio", self._abrir_solicitar),
+            ("contratos", "Mis Contratos", self._abrir_contratos),
+            ("publicar", "Publicar Servicio", self._abrir_publicar),
+            ("reto", "Análisis de Vectores", self._abrir_reto),
+            ("admin", "Panel Administrador", self._abrir_admin),
         ]
 
         self.nav_frame = tk.Frame(self.sidebar, bg=self.c_sidebar)
@@ -231,7 +253,7 @@ class YpriApp(tk.Tk):
 
         btn_switch = tk.Button(
             footer_frame,
-            text="🔄 Cambiar Usuario",
+            text="Cambiar Usuario",
             font=("Segoe UI", 9, "bold"),
             bg="#334155",
             fg="#F8FAFC",
@@ -277,6 +299,8 @@ class YpriApp(tk.Tk):
 
         if clave == "catalogo":
             self._vista_catalogo()
+        elif clave == "matrices":
+            self._vista_matrices()
         elif clave == "solicitar":
             self._vista_solicitar()
         elif clave == "contratos":
@@ -290,6 +314,7 @@ class YpriApp(tk.Tk):
 
     # Callbacks de navegacion
     def _abrir_catalogo(self): self.mostrar_vista("catalogo")
+    def _abrir_matrices(self): self.mostrar_vista("matrices")
     def _abrir_solicitar(self): self.mostrar_vista("solicitar")
     def _abrir_contratos(self): self.mostrar_vista("contratos")
     def _abrir_publicar(self): self.mostrar_vista("publicar")
@@ -439,7 +464,7 @@ class YpriApp(tk.Tk):
 
         btn_contratar = tk.Button(
             bar_accion,
-            text="🤝 Solicitar Contratación de este Servicio",
+            text=" Solicitar Contratación de este Servicio",
             font=("Segoe UI", 10, "bold"),
             bg=self.c_primary,
             fg="#FFFFFF",
@@ -455,7 +480,7 @@ class YpriApp(tk.Tk):
 
         btn_detalle = tk.Button(
             bar_accion,
-            text="🔎 Ver Detalle Completo",
+            text=" Ver Detalle Completo",
             font=("Segoe UI", 9),
             bg="#E2E8F0",
             fg="#1E293B",
@@ -519,7 +544,7 @@ class YpriApp(tk.Tk):
             self.tree_servicios.delete(item)
 
         for s in resultado:
-            disp_str = "🟢 Inmediata" if s["disponible"] else "🔴 No disponible"
+            disp_str = "[Disponible] Inmediata" if s["disponible"] else "[Ocupado] No disponible"
             self.tree_servicios.insert(
                 "",
                 "end",
@@ -531,7 +556,7 @@ class YpriApp(tk.Tk):
                     f"${s['tarifa_hora']:,.0f}",
                     s["ciudad"],
                     disp_str,
-                    f"⭐ {s['calificacion']:.1f}",
+                    f"* {s['calificacion']:.1f}",
                     s["num_contratos"]
                 )
             )
@@ -560,7 +585,7 @@ class YpriApp(tk.Tk):
             f"Ciudad de Cobertura: {serv['ciudad']}\n"
             f"Tarifa por Hora: ${serv['tarifa_hora']:,.0f} COP\n"
             f"Disponibilidad Inmediata: {'Sí' if serv['disponible'] else 'No'}\n"
-            f"Calificación Promedio: ⭐ {serv['calificacion']:.1f}\n"
+            f"Calificación Promedio: * {serv['calificacion']:.1f}\n"
             f"Contratos Realizados: {serv['num_contratos']}\n\n"
             f"Descripción del Trabajo:\n{serv['descripcion']}"
         )
@@ -844,7 +869,7 @@ class YpriApp(tk.Tk):
         # Cargar contratos correspondientes al usuario
         for c in contratos:
             if u["rol"] == "admin" or c["cliente_id"] == u["id"] or u["nombre"] in c["servicio_nombre"]:
-                calif_str = f"⭐ {c['calificacion']:.1f}" if c.get("calificacion", 0) > 0 else "Sin calificar"
+                calif_str = f"* {c['calificacion']:.1f}" if c.get("calificacion", 0) > 0 else "Sin calificar"
                 self.tree_contratos.insert(
                     "",
                     "end",
@@ -866,7 +891,7 @@ class YpriApp(tk.Tk):
 
         btn_actualizar_estado = tk.Button(
             bar_accion,
-            text="🔄 Actualizar Estado de Contrato",
+            text=" Actualizar Estado de Contrato",
             font=("Segoe UI", 9, "bold"),
             bg="#334155",
             fg="#FFFFFF",
@@ -882,7 +907,7 @@ class YpriApp(tk.Tk):
 
         btn_calificar = tk.Button(
             bar_accion,
-            text="⭐ Calificar Servicio Completado",
+            text="* Calificar Servicio Completado",
             font=("Segoe UI", 9, "bold"),
             bg="#D97706",
             fg="#FFFFFF",
@@ -1004,11 +1029,11 @@ class YpriApp(tk.Tk):
                 "fecha": "19/10/2026"
             })
 
-            messagebox.showinfo("YPRI", f"¡Calificación de {punt}⭐ registrada exitosamente!")
+            messagebox.showinfo("YPRI", f"¡Calificación de {punt}* registrada exitosamente!")
             win.destroy()
             self.mostrar_vista("contratos")
 
-        btn_guardar = tk.Button(win, text="⭐ Enviar Calificación", font=("Segoe UI", 10, "bold"), bg="#D97706", fg="#FFFFFF", bd=0, pady=8, command=registrar_calif)
+        btn_guardar = tk.Button(win, text="* Enviar Calificación", font=("Segoe UI", 10, "bold"), bg="#D97706", fg="#FFFFFF", bd=0, pady=8, command=registrar_calif)
         btn_guardar.pack(fill="x", pady=16)
 
     # ====================================================================================
@@ -1102,7 +1127,7 @@ class YpriApp(tk.Tk):
 
         btn_guardar = tk.Button(
             form_frame,
-            text="🚀 Guardar y Publicar Servicio",
+            text=" Guardar y Publicar Servicio",
             font=("Segoe UI", 10, "bold"),
             bg=self.c_primary,
             fg="#FFFFFF",
@@ -1112,6 +1137,371 @@ class YpriApp(tk.Tk):
             command=publicar
         )
         btn_guardar.grid(row=5, column=1, sticky="w", padx=10, pady=16)
+
+    # ====================================================================================
+    # VISTA GUIA 9: MATRICES EN PYTHON (CREACION, RECORRIDO Y OPERACIONES)
+    # ====================================================================================
+
+    def _vista_matrices(self):
+        """
+        GUIA 9 - ACTIVIDADES 1, 2, 3, 4, 5:
+        Visualizacion, registro, modificacion, recorrido y operaciones matematicas
+        sobre estructuras de datos bidimensionales (listas de listas).
+        """
+        # Encabezado
+        header = tk.Frame(self.content_area, bg=self.c_bg)
+        header.pack(fill="x", pady=(0, 14))
+
+        tk.Label(
+            header,
+            text="Matrices en Python — Creación, Recorrido y Operaciones",
+            font=("Segoe UI", 18, "bold"),
+            bg=self.c_bg,
+            fg=self.c_text
+        ).pack(anchor="w")
+
+        tk.Label(
+            header,
+            text="Guía 9 (FESC 2026): Estructuras bidimensionales matriz[i][j], ciclos for anidados y análisis de facturación",
+            font=("Segoe UI", 9),
+            bg=self.c_bg,
+            fg=self.c_muted
+        ).pack(anchor="w")
+
+        # Variable de seleccion de matriz activa
+        if not hasattr(self, "_tipo_matriz_activa"):
+            self._tipo_matriz_activa = "semanal"
+
+        # Tarjeta de Controles y Acciones
+        card_controles = tk.Frame(self.content_area, bg=self.c_card, padx=16, pady=12, bd=1, relief="solid")
+        card_controles.pack(fill="x", pady=(0, 12))
+
+        # Selector de matriz
+        tk.Label(card_controles, text="Seleccionar Matriz Bidimensional:", font=("Segoe UI", 10, "bold"), bg=self.c_card, fg=self.c_text).pack(side="left", padx=(0, 10))
+
+        def cambiar_matriz(tipo):
+            self._tipo_matriz_activa = tipo
+            self.mostrar_vista("matrices")
+
+        btn_mat_semanal = tk.Button(
+            card_controles,
+            text="Ventas Semanales (5x6)",
+            font=("Segoe UI", 9, "bold" if self._tipo_matriz_activa == "semanal" else "normal"),
+            bg=self.c_primary if self._tipo_matriz_activa == "semanal" else "#E2E8F0",
+            fg="#FFFFFF" if self._tipo_matriz_activa == "semanal" else "#1E293B",
+            bd=0,
+            padx=10,
+            pady=5,
+            cursor="hand2",
+            command=lambda: cambiar_matriz("semanal")
+        )
+        btn_mat_semanal.pack(side="left", padx=4)
+
+        btn_mat_ciudades = tk.Button(
+            card_controles,
+            text="Matriz Cuadrada Ciudades (5x5)",
+            font=("Segoe UI", 9, "bold" if self._tipo_matriz_activa == "ciudades" else "normal"),
+            bg=self.c_primary if self._tipo_matriz_activa == "ciudades" else "#E2E8F0",
+            fg="#FFFFFF" if self._tipo_matriz_activa == "ciudades" else "#1E293B",
+            bd=0,
+            padx=10,
+            pady=5,
+            cursor="hand2",
+            command=lambda: cambiar_matriz("ciudades")
+        )
+        btn_mat_ciudades.pack(side="left", padx=4)
+
+        # Botones de Accion
+        btn_ejercicio = tk.Button(
+            card_controles,
+            text="Ejercicio Guiado (3x3)",
+            font=("Segoe UI", 9),
+            bg="#0284C7",
+            fg="#FFFFFF",
+            bd=0,
+            padx=10,
+            pady=5,
+            cursor="hand2",
+            command=self._dialogo_ejercicio_guiado_guia9
+        )
+        btn_ejercicio.pack(side="right", padx=4)
+
+        btn_especiales = tk.Button(
+            card_controles,
+            text="Matrices Especiales",
+            font=("Segoe UI", 9),
+            bg="#475569",
+            fg="#FFFFFF",
+            bd=0,
+            padx=10,
+            pady=5,
+            cursor="hand2",
+            command=self._dialogo_matrices_especiales
+        )
+        btn_especiales.pack(side="right", padx=4)
+
+        btn_sync = tk.Button(
+            card_controles,
+            text="Sincronizar Contratos",
+            font=("Segoe UI", 9),
+            bg=self.c_success,
+            fg="#FFFFFF",
+            bd=0,
+            padx=10,
+            pady=5,
+            cursor="hand2",
+            command=self._accion_sincronizar_matriz
+        )
+        btn_sync.pack(side="right", padx=4)
+
+        # Determinar que matriz y etiquetas usar
+        if self._tipo_matriz_activa == "semanal":
+            matriz_actual = matriz_ventas_semanales
+            cols_nombres = DIAS_SEMANA_MATRIZ
+            subtitulo_matriz = "Facturación Semanal por Categoría y Día Laboral (5 filas x 6 columnas)"
+        else:
+            matriz_actual = matriz_ventas_ciudades
+            cols_nombres = CIUDADES_COBERTURA
+            subtitulo_matriz = "Demanda Geográfica por Categoría y Ciudad (5x5 — MATRIZ CUADRADA)"
+
+        filas_nombres = CATEGORIAS_SERVICIO
+
+        # Analisis Matematico (Actividad 4)
+        info_analisis = analizar_rendimiento_matriz(matriz_actual, filas_nombres, cols_nombres)
+
+        # Contenedor de Tarjetas KPI
+        kpi_frame = tk.Frame(self.content_area, bg=self.c_bg)
+        kpi_frame.pack(fill="x", pady=(0, 14))
+
+        kpis = [
+            ("TOTAL GENERAL (COP)", f"${info_analisis['total_general']:,.0f}", "#1E3A8A", "#DBEAFE"),
+            ("PROMEDIO / CELDA", f"${info_analisis['promedio_registro']:,.0f}", "#065F46", "#D1FAE5"),
+            ("CATEGORÍA LÍDER", f"{info_analisis['categoria_lider']}", "#7C2D12", "#FFEDD5"),
+            (f"{'DÍA' if self._tipo_matriz_activa == 'semanal' else 'CIUDAD'} RÉCORD", f"{info_analisis['columna_lider']}", "#581C87", "#F3E8FF"),
+        ]
+
+        for i, (titulo_kpi, valor_kpi, fg_c, bg_c) in enumerate(kpis):
+            card = tk.Frame(kpi_frame, bg=self.c_card, padx=14, pady=10, bd=1, relief="solid")
+            card.pack(side="left", fill="both", expand=True, padx=4 if i > 0 else (0, 4))
+            tk.Label(card, text=titulo_kpi, font=("Segoe UI", 8, "bold"), bg=self.c_card, fg=self.c_muted).pack(anchor="w")
+            tk.Label(card, text=valor_kpi, font=("Segoe UI", 13, "bold"), bg=self.c_card, fg=fg_c).pack(anchor="w", pady=(4, 0))
+
+        # Tarjeta para la Visualizacion de la Matriz Tabular
+        card_tabla = tk.Frame(self.content_area, bg=self.c_card, padx=16, pady=14, bd=1, relief="solid")
+        card_tabla.pack(fill="both", expand=True)
+
+        header_tabla = tk.Frame(card_tabla, bg=self.c_card)
+        header_tabla.pack(fill="x", pady=(0, 10))
+
+        tk.Label(
+            header_tabla,
+            text=subtitulo_matriz,
+            font=("Segoe UI", 11, "bold"),
+            bg=self.c_card,
+            fg=self.c_text
+        ).pack(side="left")
+
+        btn_editar_celda = tk.Button(
+            header_tabla,
+            text="Modificar Celda matriz[i][j]",
+            font=("Segoe UI", 9, "bold"),
+            bg=self.c_primary,
+            fg="#FFFFFF",
+            bd=0,
+            padx=12,
+            pady=4,
+            cursor="hand2",
+            command=lambda: self._dialogo_modificar_celda(matriz_actual, filas_nombres, cols_nombres)
+        )
+        btn_editar_celda.pack(side="right")
+
+        # Treeview para mostrar la matriz tabulada
+        columnas_tree = ["categoria"] + [f"col_{j}" for j in range(len(cols_nombres))] + ["total_fila"]
+        tree_mat = ttk.Treeview(card_tabla, columns=columnas_tree, show="headings", style="Ypri.Treeview", height=8)
+
+        tree_mat.heading("categoria", text="Categoría / Fila")
+        tree_mat.column("categoria", width=140, anchor="w")
+
+        for j, col_nom in enumerate(cols_nombres):
+            col_id = f"col_{j}"
+            tree_mat.heading(col_id, text=col_nom)
+            tree_mat.column(col_id, width=105, anchor="e")
+
+        tree_mat.heading("total_fila", text="Total Fila (COP)")
+        tree_mat.column("total_fila", width=130, anchor="e")
+
+        # Poblar filas de la matriz utilizando ciclos for anidados (Guia 9 - Seccion 1.3)
+        for i in range(len(matriz_actual)):
+            nombre_cat = filas_nombres[i]
+            fila_valores = [nombre_cat]
+            for j in range(len(matriz_actual[i])):
+                fila_valores.append(f"${matriz_actual[i][j]:,.0f}")
+            
+            # Operacion matematica: Total por fila (Actividad 4)
+            total_fila = sum(matriz_actual[i])
+            fila_valores.append(f"${total_fila:,.0f}")
+            tree_mat.insert("", "end", iid=f"fila_{i}", values=fila_valores)
+
+        # Fila especial de Totales de Columnas (Suma vertical calculada con ciclos anidados)
+        totales_cols = calcular_totales_columnas(matriz_actual)
+        fila_totales = ["TOTAL COLUMNA"]
+        for tot_col in totales_cols:
+            fila_totales.append(f"${tot_col:,.0f}")
+        total_gen = calcular_total_general(matriz_actual)
+        fila_totales.append(f"${total_gen:,.0f}")
+        tree_mat.insert("", "end", iid="totales_col", values=fila_totales)
+
+        tree_mat.pack(fill="both", expand=True)
+
+        # Pie informativo con explicacion tecnica de la Guia 9
+        footer_info = tk.Frame(card_tabla, bg="#F8FAFC", padx=10, pady=8, bd=1, relief="solid")
+        footer_info.pack(fill="x", pady=(10, 0))
+        tk.Label(
+            footer_info,
+            text="Nota: Tip Académico Guía 9: En Python, las matrices se indexan como matriz[i][j] (i = fila, j = columna). Haz doble clic en una fila o usa 'Modificar Celda' para registrar valores en tiempo real.",
+            font=("Segoe UI", 8, "italic"),
+            bg="#F8FAFC",
+            fg=self.c_muted
+        ).pack(anchor="w")
+
+    # ====================================================================================
+    # DIALOGOS Y ACCIONES PARA LA VISTA DE MATRICES
+    # ====================================================================================
+
+    def _dialogo_modificar_celda(self, matriz, filas_nombres, cols_nombres):
+        """Permite editar una celda especifica matriz[i][j] en la GUI."""
+        win = tk.Toplevel(self)
+        win.title("Modificar Celda en Matriz — YPRI")
+        win.geometry("420x360")
+        win.configure(bg="#FFFFFF")
+        win.transient(self)
+        win.grab_set()
+
+        tk.Label(win, text="Modificar Celda matriz[i][j]", font=("Segoe UI", 12, "bold"), bg="#FFFFFF", fg=self.c_text).pack(pady=(16, 6))
+        tk.Label(win, text="Selecciona la categoría (fila) y dimensión (columna):", font=("Segoe UI", 9), bg="#FFFFFF", fg=self.c_muted).pack(pady=(0, 14))
+
+        tk.Label(win, text="Categoría (Fila i):", font=("Segoe UI", 9, "bold"), bg="#FFFFFF").pack(anchor="w", padx=30, pady=(4, 2))
+        combo_fila = ttk.Combobox(win, values=list(filas_nombres), state="readonly")
+        combo_fila.set(filas_nombres[0])
+        combo_fila.pack(fill="x", padx=30)
+
+        tk.Label(win, text="Columna (Dimensión j):", font=("Segoe UI", 9, "bold"), bg="#FFFFFF").pack(anchor="w", padx=30, pady=(8, 2))
+        combo_col = ttk.Combobox(win, values=list(cols_nombres), state="readonly")
+        combo_col.set(cols_nombres[0])
+        combo_col.pack(fill="x", padx=30)
+
+        tk.Label(win, text="Nuevo Valor en Pesos ($ COP):", font=("Segoe UI", 9, "bold"), bg="#FFFFFF").pack(anchor="w", padx=30, pady=(8, 2))
+        e_valor = ttk.Entry(win)
+        e_valor.pack(fill="x", padx=30)
+        e_valor.focus()
+
+        def guardar():
+            idx_f = combo_fila.current()
+            idx_c = combo_col.current()
+            txt_val = e_valor.get().strip()
+            try:
+                val = float(txt_val)
+                if val < 0:
+                    messagebox.showerror("Error", "El valor no puede ser negativo (Guía 9).")
+                    return
+                modificar_celda(matriz, idx_f, idx_c, val)
+                messagebox.showinfo("YPRI", f"Celda matriz[{idx_f}][{idx_c}] actualizada a ${val:,.0f} COP.")
+                win.destroy()
+                self.mostrar_vista("matrices")
+            except ValueError:
+                messagebox.showerror("Error", "Ingrese un valor numérico decimal válido.")
+
+        btn_guardar = tk.Button(win, text="Guardar Cambios", font=("Segoe UI", 10, "bold"), bg=self.c_primary, fg="#FFFFFF", bd=0, pady=8, command=guardar)
+        btn_guardar.pack(fill="x", padx=30, pady=20)
+
+    def _accion_sincronizar_matriz(self):
+        """Sincroniza la matriz con los contratos completados."""
+        cant, tot = sincronizar_matriz_con_contratos_reales()
+        messagebox.showinfo("Sincronización Exitosa", f"Se procesaron {cant} contratos completados.\nSe agregaron ${tot:,.0f} COP a la matriz de ventas.")
+        self.mostrar_vista("matrices")
+
+    def _dialogo_matrices_especiales(self):
+        """Muestra ventana modal con las matrices especiales (Cuadrada, Nula, Identidad)."""
+        win = tk.Toplevel(self)
+        win.title("Matrices Especiales — Guía 9 (Sección 1.6)")
+        win.geometry("540x500")
+        win.configure(bg="#FFFFFF")
+        win.transient(self)
+
+        tk.Label(win, text="Matrices Especiales (Guía 9)", font=("Segoe UI", 13, "bold"), bg="#FFFFFF", fg=self.c_text).pack(pady=(16, 6))
+
+        # Cuadrada
+        f1 = tk.LabelFrame(win, text=" 1. Matriz Cuadrada (Igual número de filas y columnas) ", font=("Segoe UI", 9, "bold"), bg="#FFFFFF", padx=10, pady=8)
+        f1.pack(fill="x", padx=20, pady=6)
+        diag = extraer_diagonal_principal(matriz_ventas_ciudades)
+        diag_str = ", ".join([f"${x:,.0f}" for x in diag])
+        tk.Label(f1, text=f"La matriz de cobertura de YPRI es 5x5 (5 categorías x 5 ciudades).\nDiagonal principal: [{diag_str}]", font=("Segoe UI", 9), bg="#FFFFFF", justify="left").pack(anchor="w")
+
+        # Nula
+        f2 = tk.LabelFrame(win, text=" 2. Matriz Nula (Todos los elementos son cero) ", font=("Segoe UI", 9, "bold"), bg="#FFFFFF", padx=10, pady=8)
+        f2.pack(fill="x", padx=20, pady=6)
+        mat_nula = crear_matriz_nula(3, 3)
+        nula_str = "\n".join(["   " + str(fila) for fila in mat_nula])
+        tk.Label(f2, text=f"Ejemplo 3x3 generado con comprensión de listas:\n{nula_str}", font=("Courier New", 9), bg="#FFFFFF", justify="left").pack(anchor="w")
+
+        # Identidad
+        f3 = tk.LabelFrame(win, text=" 3. Matriz Identidad (Unos en diagonal y ceros en el resto) ", font=("Segoe UI", 9, "bold"), bg="#FFFFFF", padx=10, pady=8)
+        f3.pack(fill="x", padx=20, pady=6)
+        mat_id = crear_matriz_identidad(3)
+        id_str = "\n".join(["   " + str(fila) for fila in mat_id])
+        tk.Label(f3, text=f"Ejemplo de orden 3x3 (1.0 en i == j):\n{id_str}", font=("Courier New", 9), bg="#FFFFFF", justify="left").pack(anchor="w")
+
+        tk.Button(win, text="Cerrar", font=("Segoe UI", 9, "bold"), bg="#475569", fg="#FFFFFF", bd=0, pady=6, command=win.destroy).pack(pady=12)
+
+    def _dialogo_ejercicio_guiado_guia9(self):
+        """Ejecuta y muestra el ejercicio academico de la Seccion 2 de la Guia 9."""
+        win = tk.Toplevel(self)
+        win.title("Ejercicio Guiado — Guía 9 (Sección 2)")
+        win.geometry("560x520")
+        win.configure(bg="#FFFFFF")
+        win.transient(self)
+
+        tk.Label(win, text=" Ejercicio Práctico Guiado (Guía 9)", font=("Segoe UI", 13, "bold"), bg="#FFFFFF", fg=self.c_text).pack(pady=(16, 4))
+        tk.Label(win, text="Registro de 3 productos x 3 días con cálculo de totales y promedios", font=("Segoe UI", 9), bg="#FFFFFF", fg=self.c_muted).pack(pady=(0, 10))
+
+        prods = ["Producto A", "Producto B", "Producto C"]
+        dias = ["Lunes", "Martes", "Miércoles"]
+        vts = [
+            [150000.0, 200000.0, 180000.0],
+            [120000.0, 250000.0, 300000.0],
+            [175000.0, 190000.0, 220000.0]
+        ]
+
+        txt = tk.Text(win, font=("Courier New", 9), bg="#F8FAFC", bd=1, relief="solid", padx=10, pady=10)
+        txt.pack(fill="both", expand=True, padx=20, pady=(0, 10))
+
+        salida = []
+        salida.append("=== MATRIZ DE VENTAS (3x3) ===")
+        salida.append(f"{'PRODUCTO':<14}{'Lunes':>12}{'Martes':>12}{'Miércoles':>12}{'TOTAL':>12}")
+        salida.append("-" * 62)
+
+        for i in range(len(vts)):
+            tot_p = sum(vts[i])
+            salida.append(f"{prods[i]:<14}${vts[i][0]:>11,.2f}${vts[i][1]:>11,.2f}${vts[i][2]:>11,.2f}${tot_p:>11,.2f}")
+
+        salida.append("-" * 62)
+        tot_dias = []
+        for j in range(len(dias)):
+            t_d = sum(vts[i][j] for i in range(len(prods)))
+            tot_dias.append(t_d)
+        
+        tot_gen = sum(sum(f) for f in vts)
+        salida.append(f"{'TOTAL DÍA':<14}${tot_dias[0]:>11,.2f}${tot_dias[1]:>11,.2f}${tot_dias[2]:>11,.2f}${tot_gen:>11,.2f}\n")
+
+        salida.append(f"TOTAL GENERAL: ${tot_gen:,.2f}")
+        cant_reg = len(prods) * len(dias)
+        prom = tot_gen / cant_reg
+        salida.append(f"PROMEDIO POR REGISTRO: ${round(prom, 2):,.2f}")
+
+        txt.insert("1.0", "\n".join(salida))
+        txt.config(state="disabled")
+
+        tk.Button(win, text="Cerrar", font=("Segoe UI", 9, "bold"), bg="#475569", fg="#FFFFFF", bd=0, pady=6, command=win.destroy).pack(pady=10)
 
     # ====================================================================================
     # VISTA 5: RETO DE INTEGRACION Y ANALISIS DEL VECTOR (GUIA 8 - ACTIVIDAD 13)
@@ -1160,10 +1550,10 @@ class YpriApp(tk.Tk):
         kpi_frame.pack(fill="x", pady=(0, 16))
 
         metricas = [
-            ("🟢 SERVICIO MÁS ECONÓMICO", f"${s_min['tarifa_hora']:,.0f}/h", f"{s_min['codigo']} • {s_min['categoria']}", s_min['prestador_nombre']),
-            ("💎 SERVICIO MAYOR TARIFA", f"${s_max['tarifa_hora']:,.0f}/h", f"{s_max['codigo']} • {s_max['categoria']}", s_max['prestador_nombre']),
-            ("⭐ MEJOR VALORADO", f"{s_best['calificacion']:.1f} Estrellas", f"{s_best['codigo']} • {s_best['categoria']}", s_best['prestador_nombre']),
-            ("📈 TARIFA PROMEDIO", f"${tarifa_prom:,.0f}/h", f"Sobre {len(servicios)} servicios", "Vector YPRI"),
+            ("[Disponible] SERVICIO MÁS ECONÓMICO", f"${s_min['tarifa_hora']:,.0f}/h", f"{s_min['codigo']} • {s_min['categoria']}", s_min['prestador_nombre']),
+            (" SERVICIO MAYOR TARIFA", f"${s_max['tarifa_hora']:,.0f}/h", f"{s_max['codigo']} • {s_max['categoria']}", s_max['prestador_nombre']),
+            ("* MEJOR VALORADO", f"{s_best['calificacion']:.1f} Estrellas", f"{s_best['codigo']} • {s_best['categoria']}", s_best['prestador_nombre']),
+            (" TARIFA PROMEDIO", f"${tarifa_prom:,.0f}/h", f"Sobre {len(servicios)} servicios", "Vector YPRI"),
         ]
 
         for titulo, val, sub, autor in metricas:
@@ -1181,7 +1571,7 @@ class YpriApp(tk.Tk):
 
         tk.Label(
             top_frame,
-            text="🏆 Ranking Top 3: Servicios con Mayor Número de Contratos Realizados",
+            text=" Ranking Top 3: Servicios con Mayor Número de Contratos Realizados",
             font=("Segoe UI", 12, "bold"),
             bg=self.c_card,
             fg=self.c_text
@@ -1196,7 +1586,7 @@ class YpriApp(tk.Tk):
             tk.Label(row, text=f"{s['codigo']} — {s['categoria']}", font=("Segoe UI", 10, "bold"), bg="#F8FAFC", width=22, anchor="w").pack(side="left")
             tk.Label(row, text=f"Prestador: {s['prestador_nombre']} ({s['ciudad']})", font=("Segoe UI", 9), bg="#F8FAFC", width=30, anchor="w").pack(side="left")
             tk.Label(row, text=f"Tarifa: ${s['tarifa_hora']:,.0f}/h", font=("Segoe UI", 9), bg="#F8FAFC", width=18, anchor="w").pack(side="left")
-            tk.Label(row, text=f"⭐ {s['calificacion']:.1f}", font=("Segoe UI", 9, "bold"), bg="#F8FAFC", fg="#D97706", width=8).pack(side="left")
+            tk.Label(row, text=f"* {s['calificacion']:.1f}", font=("Segoe UI", 9, "bold"), bg="#F8FAFC", fg="#D97706", width=8).pack(side="left")
             tk.Label(row, text=f"{s['num_contratos']} contratos", font=("Segoe UI", 9, "bold"), bg="#F8FAFC", fg=self.c_success).pack(side="right")
 
     # ====================================================================================
@@ -1277,7 +1667,7 @@ class YpriApp(tk.Tk):
         for u in usuarios:
             btn = tk.Button(
                 win,
-                text=f"👤 {u['nombre']}  ({u['rol'].capitalize()} • {u['ciudad']})\n   {u['correo']}",
+                text=f" {u['nombre']}  ({u['rol'].capitalize()} • {u['ciudad']})\n   {u['correo']}",
                 font=("Segoe UI", 9),
                 bg="#F8FAFC",
                 fg="#0F172A",
@@ -1297,7 +1687,7 @@ class YpriApp(tk.Tk):
 
         btn_nuevo = tk.Button(
             win,
-            text="➕ Registrar Nuevo Usuario",
+            text=" Registrar Nuevo Usuario",
             font=("Segoe UI", 9, "bold"),
             bg="#334155",
             fg="#FFFFFF",

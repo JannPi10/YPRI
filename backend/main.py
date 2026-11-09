@@ -7,9 +7,23 @@ Asignatura: Diseño Funcional | Unidad 2: Estructuras de Datos
 Integrantes: Jann Pierre Ortiz Zambrano y Josue David Rincon Palomino
 Institucion: Fundacion de Estudios Superiores Comfanorte (FESC) - 2026
 ========================================================================================
+DOCUMENTACION DE TEMAS POR SEMANAS:
+- [SEMANAS 5 Y 6]: Estructura general basada en bucles 'while True', sentencias 'break',
+  'continue' y menus interactivos con navegacion por teclado.
+- [SEMANA 7 - TUPLAS, CADENAS Y DICCIONARIOS]: Control de sesion autenticada en memoria,
+  normalizacion de texto (.strip(), .lower()) y validaciones defensivas.
+- [SEMANA 8 - VECTORES]: Menu de catalogo avanzado (ordenamientos asc/desc, busqueda
+  secuencial y por atributos, reto de integracion con min/max y ranking).
+- [SEMANA 9 - MATRICES EN PYTHON]: Nuevo modulo interactivo para la creacion, recorrido,
+  consulta, modificacion y operaciones matematicas sobre matrices bidimensionales (Guia 9).
+========================================================================================
 """
 
 import sys
+import os
+
+# Asegurar resolucion de modulos internos independientemente de la ruta de ejecucion
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from core.validaciones import (
     separador,
     mostrar_encabezado,
@@ -30,7 +44,15 @@ from modules.contratos import (
     actualizar_estado_contrato,
 )
 from modules.calificaciones import calificar_servicio
-from modules.admin import listar_usuarios, ver_estadisticas
+from modules.admin import (
+    listar_usuarios,
+    ver_estadisticas,
+    ver_reporte_matricial_admin,
+)
+from modules.matrices import (
+    menu_matrices_interactivo,
+    ejecutar_ejercicio_practico_guia9,
+)
 
 
 def menu_cliente():
@@ -47,10 +69,11 @@ def menu_cliente():
         print("  3. Solicitar servicio (cotizacion y contrato)")
         print("  4. Ver mis contratos")
         print("  5. Calificar un servicio completado")
+        print("  6. Explorar Matrices Analiticas de YPRI (Guia 9)")
         print("  0. Cerrar sesion")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-5): ").strip()
+        opcion = input("  Seleccione una opcion (0-6): ").strip()
 
         if opcion == "1":
             menu_catalogo_avanzado()
@@ -62,11 +85,13 @@ def menu_cliente():
             ver_mis_contratos()
         elif opcion == "5":
             calificar_servicio()
+        elif opcion == "6":
+            menu_matrices_interactivo()
         elif opcion == "0":
             cerrar_sesion()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 5.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 6.")
 
         input("\n  Presione Enter para continuar...")
         print()
@@ -86,10 +111,11 @@ def menu_prestador():
         print("  3. Modificar un servicio propio")
         print("  4. Ver contratos asociados")
         print("  5. Actualizar estado de contrato")
+        print("  6. Explorar Matrices de Facturacion (Guia 9)")
         print("  0. Cerrar sesion")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-5): ").strip()
+        opcion = input("  Seleccione una opcion (0-6): ").strip()
 
         if opcion == "1":
             listar_servicios(filtro_ciudad=usuario["ciudad"])
@@ -101,11 +127,13 @@ def menu_prestador():
             ver_mis_contratos()
         elif opcion == "5":
             actualizar_estado_contrato()
+        elif opcion == "6":
+            menu_matrices_interactivo()
         elif opcion == "0":
             cerrar_sesion()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 5.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 6.")
 
         input("\n  Presione Enter para continuar...")
         print()
@@ -124,12 +152,14 @@ def menu_admin():
         print("  2. Ver catalogo general de servicios")
         print("  3. Ver todos los contratos")
         print("  4. Actualizar estado de contrato")
-        print("  5. Ver reporte de metricas y estadisticas")
-        print("  6. Modificar informacion de un servicio")
+        print("  5. Ver reporte consolidado de metricas y estadisticas")
+        print("  6. Modulo de Matrices en Python (Guia 9: Ventas, Especiales, Ejercicio)")
+        print("  7. Auditoria visual de matrices completas (Admin)")
+        print("  8. Modificar informacion de un servicio")
         print("  0. Cerrar sesion")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-6): ").strip()
+        opcion = input("  Seleccione una opcion (0-8): ").strip()
 
         if opcion == "1":
             listar_usuarios()
@@ -142,12 +172,16 @@ def menu_admin():
         elif opcion == "5":
             ver_estadisticas()
         elif opcion == "6":
+            menu_matrices_interactivo()
+        elif opcion == "7":
+            ver_reporte_matricial_admin()
+        elif opcion == "8":
             modificar_servicio()
         elif opcion == "0":
             cerrar_sesion()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 6.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 8.")
 
         input("\n  Presione Enter para continuar...")
         print()
@@ -158,7 +192,6 @@ def main():
     Punto de entrada principal.
     Permite operar en modo consola o abrir la interfaz grafica moderna (GUI).
     """
-    # Si se pasa --gui como argumento por linea de comandos, abrir GUI directamente
     if len(sys.argv) > 1 and ("--gui" in sys.argv or "-g" in sys.argv):
         from app_gui import main_gui
         main_gui()
@@ -169,11 +202,13 @@ def main():
         print()
         print("  1. Iniciar sesion (Modo Consola)")
         print("  2. Registrarse como nuevo usuario")
-        print("  3. Abrir Interfaz Grafica Moderna (GUI)")
+        print("  3. Modulo de Matrices en Python — Guia 9 (Directo)")
+        print("  4. Ejecutar Ejercicio Practico Guiado Guia 9 (3x3)")
+        print("  5. Abrir Interfaz Grafica de Escritorio (Tkinter)")
         print("  0. Salir")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-3): ").strip()
+        opcion = input("  Seleccione una opcion (0-5): ").strip()
 
         if opcion == "1":
             if login():
@@ -188,7 +223,12 @@ def main():
             registrar_usuario()
             input("\n  Presione Enter para continuar...")
         elif opcion == "3":
-            print("\n  [i] Iniciando interfaz grafica moderna de YPRI...")
+            menu_matrices_interactivo()
+        elif opcion == "4":
+            ejecutar_ejercicio_practico_guia9(interactivo=False)
+            input("\n  Presione Enter para continuar...")
+        elif opcion == "5":
+            print("\n  [i] Iniciando interfaz grafica de escritorio de YPRI...")
             from app_gui import main_gui
             main_gui()
         elif opcion == "0":
@@ -197,7 +237,7 @@ def main():
             print()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese 1, 2, 3 o 0.")
+            print("\n[!] Opcion invalida. Ingrese 1, 2, 3, 4, 5 o 0.")
 
         print()
 
