@@ -16,6 +16,8 @@ DOCUMENTACION DE TEMAS POR SEMANAS:
   secuencial y por atributos, reto de integracion con min/max y ranking).
 - [SEMANA 9 - MATRICES EN PYTHON]: Nuevo modulo interactivo para la creacion, recorrido,
   consulta, modificacion y operaciones matematicas sobre matrices bidimensionales (Guia 9).
+- [SEMANA 10 - SUBALGORITMOS EN PYTHON]: Modularizacion con funciones puras con return,
+  procedimientos de presentacion, funciones lambda y paso de argumentos (Guia 10).
 ========================================================================================
 """
 
@@ -53,6 +55,11 @@ from modules.matrices import (
     menu_matrices_interactivo,
     ejecutar_ejercicio_practico_guia9,
 )
+from modules.subalgoritmos import (
+    menu_subalgoritmos_interactivo,
+    mostrar_tarjeta_rendimiento_prestador,
+    calcular_metricas_prestador,
+)
 
 
 def menu_cliente():
@@ -70,10 +77,11 @@ def menu_cliente():
         print("  4. Ver mis contratos")
         print("  5. Calificar un servicio completado")
         print("  6. Explorar Matrices Analiticas de YPRI (Guia 9)")
+        print("  7. Explorador de Subalgoritmos y Cotizador Avanzado (Guia 10)")
         print("  0. Cerrar sesion")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-6): ").strip()
+        opcion = input("  Seleccione una opcion (0-7): ").strip()
 
         if opcion == "1":
             menu_catalogo_avanzado()
@@ -87,11 +95,13 @@ def menu_cliente():
             calificar_servicio()
         elif opcion == "6":
             menu_matrices_interactivo()
+        elif opcion == "7":
+            menu_subalgoritmos_interactivo()
         elif opcion == "0":
             cerrar_sesion()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 6.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 7.")
 
         input("\n  Presione Enter para continuar...")
         print()
@@ -112,10 +122,11 @@ def menu_prestador():
         print("  4. Ver contratos asociados")
         print("  5. Actualizar estado de contrato")
         print("  6. Explorar Matrices de Facturacion (Guia 9)")
+        print("  7. Tarjeta de Rendimiento Operativo y Comisiones (Guia 10)")
         print("  0. Cerrar sesion")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-6): ").strip()
+        opcion = input("  Seleccione una opcion (0-7): ").strip()
 
         if opcion == "1":
             listar_servicios(filtro_ciudad=usuario["ciudad"])
@@ -129,11 +140,15 @@ def menu_prestador():
             actualizar_estado_contrato()
         elif opcion == "6":
             menu_matrices_interactivo()
+        elif opcion == "7":
+            from data.database import contratos, calificaciones
+            metricas = calcular_metricas_prestador(usuario["id"], contratos, calificaciones)
+            mostrar_tarjeta_rendimiento_prestador(usuario["nombre"], metricas)
         elif opcion == "0":
             cerrar_sesion()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 6.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 7.")
 
         input("\n  Presione Enter para continuar...")
         print()
@@ -156,10 +171,11 @@ def menu_admin():
         print("  6. Modulo de Matrices en Python (Guia 9: Ventas, Especiales, Ejercicio)")
         print("  7. Auditoria visual de matrices completas (Admin)")
         print("  8. Modificar informacion de un servicio")
+        print("  9. Modulo de Subalgoritmos y Metricas Modulares (Guia 10)")
         print("  0. Cerrar sesion")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-8): ").strip()
+        opcion = input("  Seleccione una opcion (0-9): ").strip()
 
         if opcion == "1":
             listar_usuarios()
@@ -177,11 +193,13 @@ def menu_admin():
             ver_reporte_matricial_admin()
         elif opcion == "8":
             modificar_servicio()
+        elif opcion == "9":
+            menu_subalgoritmos_interactivo()
         elif opcion == "0":
             cerrar_sesion()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 8.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 9.")
 
         input("\n  Presione Enter para continuar...")
         print()
@@ -204,11 +222,13 @@ def main():
         print("  2. Registrarse como nuevo usuario")
         print("  3. Modulo de Matrices en Python — Guia 9 (Directo)")
         print("  4. Ejecutar Ejercicio Practico Guiado Guia 9 (3x3)")
-        print("  5. Abrir Interfaz Grafica de Escritorio (Tkinter)")
+        print("  5. Subalgoritmos en Python — Guia 10 (Funciones, Procedimientos, Lambdas)")
+        print("  6. Ejecutar Ejercicio Practico Guiado Guia 10 (Inventario)")
+        print("  7. Abrir Interfaz Grafica de Escritorio (Tkinter)")
         print("  0. Salir")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-5): ").strip()
+        opcion = input("  Seleccione una opcion (0-7): ").strip()
 
         if opcion == "1":
             if login():
@@ -228,6 +248,12 @@ def main():
             ejecutar_ejercicio_practico_guia9(interactivo=False)
             input("\n  Presione Enter para continuar...")
         elif opcion == "5":
+            menu_subalgoritmos_interactivo()
+        elif opcion == "6":
+            from ejercicio_practico_guia10 import iniciar_programa as iniciar_inventario_g10
+            iniciar_inventario_g10()
+            input("\n  Presione Enter para continuar...")
+        elif opcion == "7":
             print("\n  [i] Iniciando interfaz grafica de escritorio de YPRI...")
             from app_gui import main_gui
             main_gui()
@@ -237,7 +263,7 @@ def main():
             print()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese 1, 2, 3, 4, 5 o 0.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 7.")
 
         print()
 

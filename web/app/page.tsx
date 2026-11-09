@@ -49,6 +49,12 @@ import {
   crearMatrizNula,
   crearMatrizIdentidad,
   formatearMoneda,
+  calcularLiquidacionContrato,
+  calcularComisionPlataforma,
+  calcularPromedioRating,
+  ProductoInventario,
+  calcularSubtotalInventario,
+  calcularTotalInventario,
   Usuario,
   Servicio,
   Contrato,
@@ -73,8 +79,29 @@ export default function YpriWebApp() {
   const [subTipoMatriz, setSubTipoMatriz] = useState<"semanal" | "ciudades" | "ejercicio" | "especiales">("semanal");
 
   // Vistas
-  const [vistaActiva, setVistaActiva] = useState<"catalogo" | "matrices" | "contratos" | "publicar" | "admin">("catalogo");
+  const [vistaActiva, setVistaActiva] = useState<"catalogo" | "matrices" | "subalgoritmos" | "contratos" | "publicar" | "admin">("catalogo");
   const [modoMovil, setModoMovil] = useState<boolean>(false);
+
+  // Estados de Guía 10 (Subalgoritmos)
+  const [subG10Tab, setSubG10Tab] = useState<"funciones" | "procedimientos" | "lambdas" | "argumentos" | "inventario">("funciones");
+  const [subG10Tarifa, setSubG10Tarifa] = useState<number>(45000);
+  const [subG10Horas, setSubG10Horas] = useState<number>(4);
+  const [subG10Descuento, setSubG10Descuento] = useState<number>(10);
+  const [subG10ServicioSel, setSubG10ServicioSel] = useState<string>("SERV-001");
+  const [subG10RatingPrev, setSubG10RatingPrev] = useState<number>(4.2);
+  const [subG10RatingN, setSubG10RatingN] = useState<number>(5);
+  const [subG10RatingNueva, setSubG10RatingNueva] = useState<number>(5.0);
+  const [subG10Inventario, setSubG10Inventario] = useState<ProductoInventario[]>([
+    { codigo: "P01", nombre: "Kit Herramientas Pro", precio: 180000, cantidad: 4 },
+    { codigo: "P02", nombre: "Multímetro Digital", precio: 95000, cantidad: 8 },
+    { codigo: "P03", nombre: "Taladro Percutor 750W", precio: 250000, cantidad: 3 },
+  ]);
+  const [invCod, setInvCod] = useState("");
+  const [invNom, setInvNom] = useState("");
+  const [invPre, setInvPre] = useState("");
+  const [invCan, setInvCan] = useState("");
+  const [demoLista, setDemoLista] = useState<string[]>(["Electricidad", "Plomería"]);
+  const [demoDict, setDemoDict] = useState<{ rol: string; nivel: string }>({ rol: "cliente", nivel: "estándar" });
 
   // Modales
   const [modalCotizar, setModalCotizar] = useState<Servicio | null>(null);
@@ -456,6 +483,15 @@ export default function YpriWebApp() {
               }`}
             >
               <TrendingUp className="w-3.5 h-3.5 text-blue-400" /> Facturación y Métricas
+            </button>
+            <button
+              type="button"
+              onClick={() => setVistaActiva("subalgoritmos")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition ${
+                vistaActiva === "subalgoritmos" ? "bg-blue-600 text-white shadow-sm" : "text-slate-300 hover:bg-slate-800"
+              }`}
+            >
+              <Code2 className="w-3.5 h-3.5 text-amber-400" /> Subalgoritmos (Guía 10)
             </button>
             <button
               type="button"
@@ -1047,7 +1083,598 @@ export default function YpriWebApp() {
           )}
 
           {/* ========================================================================= */}
-          {/* VISTA 3: MIS CONTRATOS                                                    */}
+          {/* VISTA GUÍA 10: SUBALGORITMOS EN PYTHON (FUNCIONES, PROCEDIMIENTOS, LAMBDAS)*/}
+          {/* ========================================================================= */}
+          {vistaActiva === "subalgoritmos" && (
+            <div className="space-y-4">
+              {/* Encabezado */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full border border-amber-200">
+                      Guía de Aprendizaje N.º 10
+                    </span>
+                    <h2 className="text-lg font-bold text-slate-900">
+                      Subalgoritmos en Python: Funciones, Procedimientos y Modularización
+                    </h2>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Funciones puras con retorno (return), procedimientos de presentación, expresiones lambda, modularización y análisis de paso de argumentos.
+                  </p>
+                </div>
+
+                {/* Sub-tabs */}
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl overflow-x-auto scrollbar-none">
+                  <button
+                    type="button"
+                    onClick={() => setSubG10Tab("funciones")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                      subG10Tab === "funciones" ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    1. Funciones (return)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSubG10Tab("procedimientos")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                      subG10Tab === "procedimientos" ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    2. Procedimientos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSubG10Tab("lambdas")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                      subG10Tab === "lambdas" ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    3. Lambdas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSubG10Tab("argumentos")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                      subG10Tab === "argumentos" ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    4. Argumentos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSubG10Tab("inventario")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                      subG10Tab === "inventario" ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    5. Inventario (Secc. 2)
+                  </button>
+                </div>
+              </div>
+
+              {/* ---------------- PESTAÑA 1: FUNCIONES CON RETURN ---------------- */}
+              {subG10Tab === "funciones" && (() => {
+                const liq = calcularLiquidacionContrato(subG10Tarifa, subG10Horas, subG10Descuento);
+                const com = calcularComisionPlataforma(liq.totalPagar);
+                const nuevoRating = calcularPromedioRating(subG10RatingPrev, subG10RatingN, subG10RatingNueva);
+
+                return (
+                  <div className="space-y-4">
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                      <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+                        <div>
+                          <h3 className="text-sm font-bold text-slate-900">
+                            Función 1: calcular_liquidacion_contrato(tarifa, horas, descuento, tasa_iva)
+                          </h3>
+                          <p className="text-xs text-slate-500">
+                            Recibe parámetros numéricos, valida límites y retorna un diccionario estructurado mediante return.
+                          </p>
+                        </div>
+                        <span className="text-[11px] font-mono bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200">
+                          return dict
+                        </span>
+                      </div>
+
+                      {/* Formulario Reactivo */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 block mb-1">
+                            Tarifa por Hora ($ COP)
+                          </label>
+                          <input
+                            type="number"
+                            min="1000"
+                            step="5000"
+                            value={subG10Tarifa}
+                            onChange={(e) => setSubG10Tarifa(Math.max(0, Number(e.target.value)))}
+                            className="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 block mb-1">
+                            Horas Contratadas
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="100"
+                            value={subG10Horas}
+                            onChange={(e) => setSubG10Horas(Math.max(1, Number(e.target.value)))}
+                            className="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 block mb-1">
+                            Descuento Promocional (%)
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={subG10Descuento}
+                            onChange={(e) => setSubG10Descuento(Math.max(0, Math.min(100, Number(e.target.value))))}
+                            className="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Tarjetas de Desglose Financiero */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                          <span className="text-[10px] text-slate-500 block">Subtotal Bruto</span>
+                          <span className="text-sm font-bold text-slate-900">{formatearMoneda(liq.subtotalBruto)}</span>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                          <span className="text-[10px] text-slate-500 block">Descuento ({subG10Descuento}%)</span>
+                          <span className="text-sm font-bold text-rose-600">- {formatearMoneda(liq.montoDescuento)}</span>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                          <span className="text-[10px] text-slate-500 block">IVA Liquidado (19%)</span>
+                          <span className="text-sm font-bold text-slate-900">+ {formatearMoneda(liq.montoIva)}</span>
+                        </div>
+                        <div className="bg-blue-50 p-3 rounded-xl border border-blue-200">
+                          <span className="text-[10px] text-blue-700 font-bold block">Total a Pagar</span>
+                          <span className="text-sm font-extrabold text-blue-700">{formatearMoneda(liq.totalPagar)}</span>
+                        </div>
+                      </div>
+
+                      {/* Función 2: Comisión de Plataforma */}
+                      <div className="bg-emerald-50/60 p-4 rounded-xl border border-emerald-200 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-emerald-900">
+                            Función 2: calcular_comision_plataforma(total_pagar)
+                          </h4>
+                          <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
+                            Distribución YPRI
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                          <div>
+                            <span className="text-[10px] text-emerald-700 block">Comisión Plataforma (10%)</span>
+                            <span className="text-xs font-bold text-emerald-900">{formatearMoneda(com.comisionYpri)}</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-emerald-700 block">Retención Fuente (4%)</span>
+                            <span className="text-xs font-bold text-emerald-900">{formatearMoneda(com.retencionFuente)}</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-emerald-700 font-bold block">Pago Neto Prestador</span>
+                            <span className="text-xs font-extrabold text-emerald-800">{formatearMoneda(com.pagoNetoPrestador)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Función 3: Recálculo Ponderado de Calificación */}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div>
+                          <h3 className="text-sm font-bold text-slate-900">
+                            Función 3: calcular_promedio_calificacion(rating_previo, num_evaluaciones, nueva_nota)
+                          </h3>
+                          <p className="text-xs text-slate-500">
+                            Fórmula de actualización incremental de la media aritmética ponderada.
+                          </p>
+                        </div>
+                        <span className="text-[11px] font-mono bg-purple-50 text-purple-700 px-2.5 py-1 rounded-lg border border-purple-200">
+                          return float
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 block mb-1">Rating Actual</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="1.0"
+                            max="5.0"
+                            value={subG10RatingPrev}
+                            onChange={(e) => setSubG10RatingPrev(Number(e.target.value))}
+                            className="w-full text-xs p-2 border border-slate-200 rounded-xl outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 block mb-1">Total Reseñas (N)</label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={subG10RatingN}
+                            onChange={(e) => setSubG10RatingN(Math.max(1, Number(e.target.value)))}
+                            className="w-full text-xs p-2 border border-slate-200 rounded-xl outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 block mb-1">Nueva Nota (1-5)</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="1.0"
+                            max="5.0"
+                            value={subG10RatingNueva}
+                            onChange={(e) => setSubG10RatingNueva(Number(e.target.value))}
+                            className="w-full text-xs p-2 border border-slate-200 rounded-xl outline-none"
+                          />
+                        </div>
+                        <div className="bg-purple-50 p-2.5 rounded-xl border border-purple-200 text-center">
+                          <span className="text-[10px] text-purple-700 font-bold block">Nuevo Rating Ponderado</span>
+                          <span className="text-base font-extrabold text-purple-900">★ {nuevoRating} / 5.0</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ---------------- PESTAÑA 2: PROCEDIMIENTOS ---------------- */}
+              {subG10Tab === "procedimientos" && (() => {
+                const servActual = servicios.find((s) => s.codigo === subG10ServicioSel) || servicios[0];
+                const liq = calcularLiquidacionContrato(servActual.tarifa_hora, 4, 10);
+
+                return (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Procedimiento 1: Ficha Técnica */}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div className="flex items-center gap-2">
+                          <Award className="w-4 h-4 text-blue-600" />
+                          <h3 className="text-sm font-bold text-slate-900">
+                            Procedimiento 1: mostrar_ficha_tecnica_servicio()
+                          </h3>
+                        </div>
+                        <span className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
+                          void (sin return)
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-semibold text-slate-600">Servicio:</label>
+                        <select
+                          value={subG10ServicioSel}
+                          onChange={(e) => setSubG10ServicioSel(e.target.value)}
+                          className="text-xs p-2 border border-slate-200 rounded-xl flex-1 outline-none font-medium"
+                        >
+                          {servicios.map((s) => (
+                            <option key={s.codigo} value={s.codigo}>
+                              {s.codigo} — {s.categoria} ({s.prestador_nombre} • {s.ciudad})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Tarjeta Visual de Ficha Técnica */}
+                      <div className="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs space-y-1.5 border border-slate-800">
+                        <div className="text-amber-400 font-bold border-b border-slate-700 pb-1">
+                          ------------------ FICHA TÉCNICA FORMAL ------------------
+                        </div>
+                        <div><span className="text-slate-400">Código:</span> {servActual.codigo}</div>
+                        <div><span className="text-slate-400">Categoría:</span> {servActual.categoria}</div>
+                        <div><span className="text-slate-400">Prestador:</span> {servActual.prestador_nombre}</div>
+                        <div><span className="text-slate-400">Ciudad:</span> {servActual.ciudad}</div>
+                        <div><span className="text-slate-400">Tarifa Horaria:</span> {formatearMoneda(servActual.tarifa_hora)}/h</div>
+                        <div><span className="text-slate-400">Calificación:</span> ★ {servActual.calificacion} / 5.0 ({servActual.num_contratos} servicios)</div>
+                        <div><span className="text-slate-400">Experiencia:</span> {servActual.anios_experiencia} año(s)</div>
+                        <div><span className="text-slate-400">Disponibilidad:</span> {servActual.disponible ? "Inmediata (Activo)" : "Ocupado"}</div>
+                        <div><span className="text-slate-400">Descripción:</span> {servActual.descripcion}</div>
+                        <div className="text-slate-500 pt-1">----------------------------------------------------------</div>
+                      </div>
+                    </div>
+
+                    {/* Procedimiento 2: Recibo de Liquidación */}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="w-4 h-4 text-emerald-600" />
+                          <h3 className="text-sm font-bold text-slate-900">
+                            Procedimiento 2: mostrar_recibo_liquidacion()
+                          </h3>
+                        </div>
+                        <span className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
+                          void (sin return)
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-500">
+                        Formatea y presenta en pantalla la factura final para el cliente y los registros de auditoría.
+                      </p>
+
+                      <div className="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs space-y-1.5 border border-slate-800">
+                        <div className="text-emerald-400 font-bold border-b border-slate-700 pb-1 text-center">
+                          === RECIBO DE COTIZACIÓN Y LIQUIDACIÓN — YPRI ===
+                        </div>
+                        <div><span className="text-slate-400">Servicio:</span> {servActual.codigo} - {servActual.categoria}</div>
+                        <div><span className="text-slate-400">Prestador:</span> {servActual.prestador_nombre}</div>
+                        <div><span className="text-slate-400">Horas:</span> {liq.horas} hora(s) @ {formatearMoneda(liq.tarifaHora)}</div>
+                        <div className="border-t border-slate-800 pt-1">
+                          <span className="text-slate-400">Subtotal Bruto:</span> {formatearMoneda(liq.subtotalBruto)}
+                        </div>
+                        <div className="text-rose-400">
+                          <span className="text-slate-400">Descuento ({liq.descuentoPct}%):</span> - {formatearMoneda(liq.montoDescuento)}
+                        </div>
+                        <div>
+                          <span className="text-slate-400">Subtotal Neto:</span> {formatearMoneda(liq.subtotalNeto)}
+                        </div>
+                        <div className="text-cyan-400">
+                          <span className="text-slate-400">IVA (19%):</span> + {formatearMoneda(liq.montoIva)}
+                        </div>
+                        <div className="border-t border-slate-700 pt-1 text-emerald-300 font-bold text-sm">
+                          TOTAL A PAGAR: {formatearMoneda(liq.totalPagar)}
+                        </div>
+                        <div className="text-center text-slate-500 text-[10px] pt-1">
+                          ================================================
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ---------------- PESTAÑA 3: FUNCIONES LAMBDA ---------------- */}
+              {subG10Tab === "lambdas" && (
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">
+                        Funciones Lambda: Operaciones Breves y Criterios de Ordenamiento
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        sorted(servicios, key=lambda s: s[&apos;tarifa_hora&apos;]) y sorted(servicios, key=lambda s: s[&apos;calificacion&apos;], reverse=True)
+                      </p>
+                    </div>
+                    <span className="text-xs bg-amber-50 text-amber-800 font-bold px-2.5 py-1 rounded-lg border border-amber-200">
+                      lambda arg: expr
+                    </span>
+                  </div>
+
+                  {/* Tabla con Filtros Lambda */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 text-slate-600 font-bold uppercase text-[10px]">
+                        <tr>
+                          <th className="p-2.5 rounded-l-lg">Código</th>
+                          <th className="p-2.5">Prestador</th>
+                          <th className="p-2.5">Categoría</th>
+                          <th className="p-2.5">Ciudad</th>
+                          <th className="p-2.5 text-right">Tarifa Horaria</th>
+                          <th className="p-2.5 text-center rounded-r-lg">Rating</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {[...servicios]
+                          .sort((a, b) => b.tarifa_hora - a.tarifa_hora)
+                          .map((s) => (
+                            <tr key={s.codigo} className="hover:bg-slate-50/80 transition">
+                              <td className="p-2.5 font-mono font-bold text-blue-600">{s.codigo}</td>
+                              <td className="p-2.5 font-medium text-slate-900">{s.prestador_nombre}</td>
+                              <td className="p-2.5 text-slate-600">{s.categoria}</td>
+                              <td className="p-2.5 text-slate-600">{s.ciudad}</td>
+                              <td className="p-2.5 text-right font-semibold text-slate-900">{formatearMoneda(s.tarifa_hora)}</td>
+                              <td className="p-2.5 text-center">
+                                <span className="bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-full text-[11px] border border-amber-200">
+                                  ★ {s.calificacion}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* ---------------- PESTAÑA 4: VARIABLES & ARGUMENTOS ---------------- */}
+              {subG10Tab === "argumentos" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Inmutables */}
+                  <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <span className="text-[10px] bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded-full">
+                      Objetos Inmutables (int, float, str, tuple)
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900">
+                      Paso de Parámetros: Simulación de Paso por Valor
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Al reasignar un número o cadena dentro de una función, la variable externa en el llamador jamás sufre modificaciones.
+                    </p>
+
+                    <div className="bg-slate-900 text-slate-100 p-3.5 rounded-xl font-mono text-xs space-y-1">
+                      <p className="text-sky-400 font-bold">def modificar_numero(numero):</p>
+                      <p className="pl-4">numero = numero + 10000</p>
+                      <p className="pl-4">return numero</p>
+                      <p className="text-slate-400 pt-1">tarifa = 50000</p>
+                      <p className="text-slate-400">modificar_numero(tarifa) # Retorna 60000</p>
+                      <p className="text-emerald-400 font-bold">print(tarifa) # Imprime 50000 (INALTERADO)</p>
+                    </div>
+                  </div>
+
+                  {/* Mutables */}
+                  <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                      Objetos Mutables (list, dict, set)
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900">
+                      Paso de Parámetros: Comportamiento por Referencia
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Las colecciones mutables se modifican directamente in-place mediante métodos como append() o asignación de llaves [clave].
+                    </p>
+
+                    <div className="bg-slate-900 text-slate-100 p-3.5 rounded-xl font-mono text-xs space-y-1">
+                      <p className="text-emerald-400 font-bold">def agregar_servicio(servicios):</p>
+                      <p className="pl-4">servicios.append(&quot;Climatización&quot;)</p>
+                      <p className="text-slate-400 pt-1">inventario = [&quot;Electricidad&quot;, &quot;Plomería&quot;]</p>
+                      <p className="text-slate-400">agregar_servicio(inventario)</p>
+                      <p className="text-emerald-400 font-bold">print(inventario) # [&apos;Electricidad&apos;, &apos;Plomería&apos;, &apos;Climatización&apos;]</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setDemoLista([...demoLista, `Servicio ${demoLista.length + 1}`])}
+                        className="text-xs bg-emerald-600 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition"
+                      >
+                        Mutar Lista in-place (.append)
+                      </button>
+                      <span className="text-xs text-slate-600 font-mono">
+                        Elementos: {demoLista.length} [{demoLista.join(", ")}]
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ---------------- PESTAÑA 5: INVENTARIO GUIADO (SECCIÓN 2) ---------------- */}
+              {subG10Tab === "inventario" && (() => {
+                const totalInv = calcularTotalInventario(subG10Inventario);
+
+                const agregarProducto = (e: React.FormEvent) => {
+                  e.preventDefault();
+                  if (!invCod.trim() || !invNom.trim()) {
+                    alert("Código y nombre son requeridos.");
+                    return;
+                  }
+                  if (subG10Inventario.some((p) => p.codigo.toLowerCase() === invCod.trim().toLowerCase())) {
+                    alert("El código ya existe.");
+                    return;
+                  }
+                  const pre = parseFloat(invPre);
+                  const can = parseInt(invCan);
+                  if (isNaN(pre) || isNaN(can) || pre < 0 || can < 0) {
+                    alert("Valores numéricos no válidos o negativos.");
+                    return;
+                  }
+                  setSubG10Inventario([...subG10Inventario, { codigo: invCod.trim(), nombre: invNom.trim(), precio: pre, cantidad: can }]);
+                  setInvCod("");
+                  setInvNom("");
+                  setInvPre("");
+                  setInvCan("");
+                };
+
+                const ordenarPorPrecio = () => {
+                  const ord = [...subG10Inventario].sort((a, b) => a.precio - b.precio);
+                  setSubG10Inventario(ord);
+                };
+
+                return (
+                  <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">
+                          Sección 2 de la Guía: Sistema de Inventario con Subalgoritmos
+                        </h3>
+                        <p className="text-xs text-slate-500">
+                          Implementación del ejercicio guiado con registro, cálculo de subtotal, ordenamiento lambda y total general.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={ordenarPorPrecio}
+                        className="text-xs bg-slate-900 text-white font-semibold px-3 py-1.5 rounded-xl hover:bg-slate-800 transition"
+                      >
+                        Ordenar por Precio (key=lambda)
+                      </button>
+                    </div>
+
+                    {/* Formulario */}
+                    <form onSubmit={agregarProducto} className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                      <input
+                        type="text"
+                        placeholder="Código (ej. P04)"
+                        value={invCod}
+                        onChange={(e) => setInvCod(e.target.value)}
+                        className="text-xs p-2 border border-slate-200 rounded-xl outline-none"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Nombre Producto"
+                        value={invNom}
+                        onChange={(e) => setInvNom(e.target.value)}
+                        className="text-xs p-2 border border-slate-200 rounded-xl outline-none"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Precio Unitario"
+                        value={invPre}
+                        onChange={(e) => setInvPre(e.target.value)}
+                        className="text-xs p-2 border border-slate-200 rounded-xl outline-none"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Cantidad"
+                        value={invCan}
+                        onChange={(e) => setInvCan(e.target.value)}
+                        className="text-xs p-2 border border-slate-200 rounded-xl outline-none"
+                      />
+                      <button
+                        type="submit"
+                        className="col-span-2 sm:col-span-1 text-xs bg-blue-600 text-white font-bold p-2 rounded-xl hover:bg-blue-700 transition"
+                      >
+                        Registrar
+                      </button>
+                    </form>
+
+                    {/* Tabla de Inventario */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-50 text-slate-600 font-bold uppercase text-[10px]">
+                          <tr>
+                            <th className="p-2.5 rounded-l-lg">Código</th>
+                            <th className="p-2.5">Nombre</th>
+                            <th className="p-2.5 text-right">Precio Unitario</th>
+                            <th className="p-2.5 text-center">Cantidad</th>
+                            <th className="p-2.5 text-right rounded-r-lg">Subtotal</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {subG10Inventario.map((p) => {
+                            const sub = calcularSubtotalInventario(p.precio, p.cantidad);
+                            return (
+                              <tr key={p.codigo} className="hover:bg-slate-50/80 transition">
+                                <td className="p-2.5 font-mono font-bold text-blue-600">{p.codigo}</td>
+                                <td className="p-2.5 font-medium text-slate-900">{p.nombre}</td>
+                                <td className="p-2.5 text-right text-slate-700">{formatearMoneda(p.precio)}</td>
+                                <td className="p-2.5 text-center font-bold text-slate-900">{p.cantidad}</td>
+                                <td className="p-2.5 text-right font-bold text-emerald-700">{formatearMoneda(sub)}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Total Inventario */}
+                    <div className="bg-blue-50 p-3.5 rounded-xl border border-blue-200 flex items-center justify-between">
+                      <span className="text-xs font-bold text-blue-900">
+                        Función calcular_total_inventario(): Suma acumulada de subtotales
+                      </span>
+                      <span className="text-base font-extrabold text-blue-700">{formatearMoneda(totalInv)}</span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
           {/* ========================================================================= */}
           {vistaActiva === "contratos" && (
             <div className="space-y-4">

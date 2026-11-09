@@ -61,6 +61,22 @@ from modules.matrices import (
     extraer_diagonal_principal,
     sincronizar_matriz_con_contratos_reales,
 )
+from modules.subalgoritmos import (
+    calcular_liquidacion_contrato,
+    calcular_comision_plataforma,
+    calcular_promedio_calificacion,
+    calcular_metricas_prestador,
+    calcular_resumen_estadistico,
+    calcular_descuento_lambda,
+    calcular_iva_lambda,
+    formatear_cop_lambda,
+    ordenar_servicios_por_tarifa,
+    ordenar_servicios_por_rating,
+    modificar_numero_prueba,
+    modificar_cadena_prueba,
+    agregar_elemento_lista_prueba,
+    actualizar_campo_diccionario_prueba,
+)
 
 
 class YpriApp(tk.Tk):
@@ -215,6 +231,7 @@ class YpriApp(tk.Tk):
         items_nav = [
             ("catalogo", "Catálogo & Búsqueda", self._abrir_catalogo),
             ("matrices", "Matrices (Guía 9)", self._abrir_matrices),
+            ("subalgoritmos", "Subalgoritmos (Guía 10)", self._abrir_subalgoritmos),
             ("solicitar", "Solicitar Servicio", self._abrir_solicitar),
             ("contratos", "Mis Contratos", self._abrir_contratos),
             ("publicar", "Publicar Servicio", self._abrir_publicar),
@@ -301,6 +318,8 @@ class YpriApp(tk.Tk):
             self._vista_catalogo()
         elif clave == "matrices":
             self._vista_matrices()
+        elif clave == "subalgoritmos":
+            self._vista_subalgoritmos()
         elif clave == "solicitar":
             self._vista_solicitar()
         elif clave == "contratos":
@@ -315,6 +334,7 @@ class YpriApp(tk.Tk):
     # Callbacks de navegacion
     def _abrir_catalogo(self): self.mostrar_vista("catalogo")
     def _abrir_matrices(self): self.mostrar_vista("matrices")
+    def _abrir_subalgoritmos(self): self.mostrar_vista("subalgoritmos")
     def _abrir_solicitar(self): self.mostrar_vista("solicitar")
     def _abrir_contratos(self): self.mostrar_vista("contratos")
     def _abrir_publicar(self): self.mostrar_vista("publicar")
@@ -1502,6 +1522,458 @@ class YpriApp(tk.Tk):
         txt.config(state="disabled")
 
         tk.Button(win, text="Cerrar", font=("Segoe UI", 9, "bold"), bg="#475569", fg="#FFFFFF", bd=0, pady=6, command=win.destroy).pack(pady=10)
+
+    # ====================================================================================
+    # VISTA: SUBALGORITMOS EN PYTHON (GUIA 10)
+    # Funciones, Procedimientos, Lambdas, Paso de Argumentos y Modularizacion
+    # ====================================================================================
+
+    def _vista_subalgoritmos(self):
+        """
+        GUIA 10:
+        Presenta el laboratorio interactivo de subalgoritmos:
+        - Funciones con return (liquidacion y comisiones)
+        - Procedimientos de interaccion (fichas tecnicas y recibos)
+        - Expresiones Lambda para calculos y ordenamiento
+        - Demostracion de variables y mutabilidad de argumentos
+        - Simulador interactivo del sistema de inventario (Seccion 2 de la Guia 10)
+        """
+        header = tk.Frame(self.content_area, bg=self.c_bg)
+        header.pack(fill="x", pady=(0, 10))
+
+        tk.Label(
+            header,
+            text="Subalgoritmos en Python: Funciones, Procedimientos y Lambdas",
+            font=("Segoe UI", 16, "bold"),
+            bg=self.c_bg,
+            fg=self.c_text,
+        ).pack(anchor="w")
+
+        tk.Label(
+            header,
+            text="Guía de Aprendizaje N.º 10 • Modularización, Retorno Explícito, Mutabilidad y Expresiones Breves",
+            font=("Segoe UI", 9),
+            bg=self.c_bg,
+            fg=self.c_text_muted,
+        ).pack(anchor="w")
+
+        # Notebook / Pestanas secundarias de Guia 10
+        nb_g10 = ttk.Notebook(self.content_area)
+        nb_g10.pack(fill="both", expand=True, pady=6)
+
+        tab_funciones = tk.Frame(nb_g10, bg=self.c_card, padx=14, pady=12)
+        tab_procedimientos = tk.Frame(nb_g10, bg=self.c_card, padx=14, pady=12)
+        tab_lambdas = tk.Frame(nb_g10, bg=self.c_card, padx=14, pady=12)
+        tab_argumentos = tk.Frame(nb_g10, bg=self.c_card, padx=14, pady=12)
+        tab_inventario = tk.Frame(nb_g10, bg=self.c_card, padx=14, pady=12)
+
+        nb_g10.add(tab_funciones, text=" Funciones con Return (Act. 2)")
+        nb_g10.add(tab_procedimientos, text=" Procedimientos (Act. 3)")
+        nb_g10.add(tab_lambdas, text=" Funciones Lambda (Act. 4)")
+        nb_g10.add(tab_argumentos, text=" Variables & Argumentos (Act. 5)")
+        nb_g10.add(tab_inventario, text=" Inventario Guiado (Sección 2)")
+
+        # --------------------------------------------------------------------------------
+        # PESTAÑA 1: FUNCIONES CON RETURN (ACTIVIDAD 2)
+        # --------------------------------------------------------------------------------
+        f_top = tk.Frame(tab_funciones, bg=self.c_card)
+        f_top.pack(fill="x", pady=(0, 10))
+
+        tk.Label(
+            f_top,
+            text="Calculadora Modular de Liquidación Financiera y Comisión (return dict)",
+            font=("Segoe UI", 11, "bold"),
+            bg=self.c_card,
+            fg=self.c_primary
+        ).pack(anchor="w")
+
+        f_inputs = tk.Frame(tab_funciones, bg=self.c_card)
+        f_inputs.pack(fill="x", pady=6)
+
+        tk.Label(f_inputs, text="Tarifa/hora ($ COP):", font=("Segoe UI", 9, "bold"), bg=self.c_card, fg=self.c_text).grid(row=0, column=0, padx=6, sticky="w")
+        ent_tarifa = tk.Entry(f_inputs, font=("Segoe UI", 10), width=12)
+        ent_tarifa.insert(0, "45000")
+        ent_tarifa.grid(row=0, column=1, padx=6, pady=4)
+
+        tk.Label(f_inputs, text="Horas:", font=("Segoe UI", 9, "bold"), bg=self.c_card, fg=self.c_text).grid(row=0, column=2, padx=6, sticky="w")
+        ent_horas = tk.Entry(f_inputs, font=("Segoe UI", 10), width=8)
+        ent_horas.insert(0, "4")
+        ent_horas.grid(row=0, column=3, padx=6, pady=4)
+
+        tk.Label(f_inputs, text="Descuento (%):", font=("Segoe UI", 9, "bold"), bg=self.c_card, fg=self.c_text).grid(row=0, column=4, padx=6, sticky="w")
+        ent_desc = tk.Entry(f_inputs, font=("Segoe UI", 10), width=8)
+        ent_desc.insert(0, "10")
+        ent_desc.grid(row=0, column=5, padx=6, pady=4)
+
+        # Panel de Resultados
+        f_cards = tk.Frame(tab_funciones, bg=self.c_card)
+        f_cards.pack(fill="x", pady=10)
+
+        lbl_res_bruto = tk.Label(f_cards, text="Subtotal: $0 COP", font=("Segoe UI", 10), bg="#F1F5F9", fg=self.c_text, padx=10, pady=8, width=20, anchor="w")
+        lbl_res_bruto.grid(row=0, column=0, padx=4, pady=4)
+
+        lbl_res_desc = tk.Label(f_cards, text="Descuento: $0 COP", font=("Segoe UI", 10), bg="#F1F5F9", fg=self.c_text, padx=10, pady=8, width=20, anchor="w")
+        lbl_res_desc.grid(row=0, column=1, padx=4, pady=4)
+
+        lbl_res_iva = tk.Label(f_cards, text="IVA (19%): $0 COP", font=("Segoe UI", 10), bg="#F1F5F9", fg=self.c_text, padx=10, pady=8, width=20, anchor="w")
+        lbl_res_iva.grid(row=0, column=2, padx=4, pady=4)
+
+        lbl_res_total = tk.Label(f_cards, text="Total: $0 COP", font=("Segoe UI", 10, "bold"), bg="#DBEAFE", fg=self.c_primary, padx=10, pady=8, width=20, anchor="w")
+        lbl_res_total.grid(row=0, column=3, padx=4, pady=4)
+
+        f_comision = tk.Frame(tab_funciones, bg=self.c_card)
+        f_comision.pack(fill="x", pady=6)
+
+        lbl_res_com = tk.Label(f_comision, text="Comisión YPRI (10%): $0 COP", font=("Segoe UI", 9), bg="#F8FAFC", fg=self.c_text, padx=8, pady=6, width=28, anchor="w")
+        lbl_res_com.grid(row=0, column=0, padx=4)
+
+        lbl_res_ret = tk.Label(f_comision, text="Retención Fuente (4%): $0 COP", font=("Segoe UI", 9), bg="#F8FAFC", fg=self.c_text, padx=8, pady=6, width=28, anchor="w")
+        lbl_res_ret.grid(row=0, column=1, padx=4)
+
+        lbl_res_neto = tk.Label(f_comision, text="Pago Neto Prestador: $0 COP", font=("Segoe UI", 9, "bold"), bg="#DCFCE7", fg="#166534", padx=8, pady=6, width=28, anchor="w")
+        lbl_res_neto.grid(row=0, column=2, padx=4)
+
+        def calcular_gui():
+            try:
+                t = float(ent_tarifa.get().strip())
+                h = int(ent_horas.get().strip())
+                d = float(ent_desc.get().strip())
+                liq = calcular_liquidacion_contrato(t, h, descuento_pct=d)
+                com = calcular_comision_plataforma(liq["total_pagar"])
+
+                lbl_res_bruto.config(text=f"Subtotal: {formatear_cop_lambda(liq['subtotal_bruto'])}")
+                lbl_res_desc.config(text=f"Descuento ({d}%): -{formatear_cop_lambda(liq['monto_descuento'])}")
+                lbl_res_iva.config(text=f"IVA (19%): +{formatear_cop_lambda(liq['monto_iva'])}")
+                lbl_res_total.config(text=f"TOTAL: {formatear_cop_lambda(liq['total_pagar'])}")
+
+                lbl_res_com.config(text=f"Comisión YPRI (10%): {formatear_cop_lambda(com['comision_ypri'])}")
+                lbl_res_ret.config(text=f"Retención (4%): {formatear_cop_lambda(com['retencion_fuente'])}")
+                lbl_res_neto.config(text=f"Neto Prestador: {formatear_cop_lambda(com['pago_neto_prestador'])}")
+            except Exception as ex:
+                messagebox.showerror("Error de Cálculo", f"Parámetros inválidos: {ex}")
+
+        btn_calc = tk.Button(f_inputs, text="Ejecutar Función con return", font=("Segoe UI", 9, "bold"), bg=self.c_primary, fg="#FFFFFF", bd=0, padx=12, pady=4, command=calcular_gui)
+        btn_calc.grid(row=0, column=6, padx=10)
+
+        # Promedio ponderado tester
+        tk.Label(tab_funciones, text="Función 3: calcular_promedio_calificacion(rating, n, nueva_nota)", font=("Segoe UI", 10, "bold"), bg=self.c_card, fg=self.c_text).pack(anchor="w", pady=(14, 4))
+        f_rating = tk.Frame(tab_funciones, bg=self.c_card)
+        f_rating.pack(fill="x")
+        tk.Label(f_rating, text="Rating actual:", bg=self.c_card).pack(side="left")
+        e_rat = tk.Entry(f_rating, width=6); e_rat.insert(0, "4.2"); e_rat.pack(side="left", padx=4)
+        tk.Label(f_rating, text="Evaluaciones:", bg=self.c_card).pack(side="left", padx=(8, 0))
+        e_n = tk.Entry(f_rating, width=6); e_n.insert(0, "5"); e_n.pack(side="left", padx=4)
+        tk.Label(f_rating, text="Nueva nota:", bg=self.c_card).pack(side="left", padx=(8, 0))
+        e_nota = tk.Entry(f_rating, width=6); e_nota.insert(0, "5.0"); e_nota.pack(side="left", padx=4)
+
+        lbl_res_rating = tk.Label(f_rating, text="Nuevo promedio: --", font=("Segoe UI", 9, "bold"), bg=self.c_card, fg=self.c_primary)
+        lbl_res_rating.pack(side="left", padx=12)
+
+        def test_rating():
+            try:
+                r = float(e_rat.get())
+                n = int(e_n.get())
+                nota = float(e_nota.get())
+                res = calcular_promedio_calificacion(r, n, nota)
+                lbl_res_rating.config(text=f"Nuevo promedio: ★ {res:.1f} / 5.0")
+            except Exception as ex:
+                messagebox.showerror("Error", str(ex))
+
+        tk.Button(f_rating, text="Calcular Rating", font=("Segoe UI", 8, "bold"), bg="#334155", fg="#FFFFFF", bd=0, padx=8, pady=2, command=test_rating).pack(side="left")
+        calcular_gui()
+
+        # --------------------------------------------------------------------------------
+        # PESTAÑA 2: PROCEDIMIENTOS (ACTIVIDAD 3)
+        # --------------------------------------------------------------------------------
+        f_proc_top = tk.Frame(tab_procedimientos, bg=self.c_card)
+        f_proc_top.pack(fill="x", pady=(0, 8))
+
+        tk.Label(
+            f_proc_top,
+            text="Procedimientos de Interacción con el Usuario (Ejecución de Tareas sin return)",
+            font=("Segoe UI", 11, "bold"),
+            bg=self.c_card,
+            fg=self.c_primary
+        ).pack(anchor="w")
+
+        f_proc_sel = tk.Frame(tab_procedimientos, bg=self.c_card)
+        f_proc_sel.pack(fill="x", pady=6)
+
+        tk.Label(f_proc_sel, text="Seleccione un Servicio:", font=("Segoe UI", 9, "bold"), bg=self.c_card).pack(side="left")
+        nombres_servicios = [f"{s['codigo']} - {s['categoria']} ({s['prestador_nombre']})" for s in servicios]
+        combo_serv = ttk.Combobox(f_proc_sel, values=nombres_servicios, width=45, state="readonly")
+        if nombres_servicios: combo_serv.current(0)
+        combo_serv.pack(side="left", padx=8)
+
+        txt_proc_out = tk.Text(tab_procedimientos, font=("Consolas", 9), height=14, bg="#0F172A", fg="#F8FAFC", padx=10, pady=8)
+        txt_proc_out.pack(fill="both", expand=True, pady=6)
+
+        def proc_ver_ficha():
+            idx = combo_serv.current()
+            if idx < 0 or idx >= len(servicios): return
+            s = servicios[idx]
+            txt_proc_out.delete("1.0", "end")
+            txt_proc_out.insert("end", "=" * 65 + "\n")
+            txt_proc_out.insert("end", f" [FICHA TÉCNICA FORMAL] {s['codigo']} — {s['categoria']}\n")
+            txt_proc_out.insert("end", "=" * 65 + "\n")
+            txt_proc_out.insert("end", f" Prestador:      {s['prestador_nombre']}\n")
+            txt_proc_out.insert("end", f" Ciudad:         {s['ciudad']}\n")
+            txt_proc_out.insert("end", f" Tarifa/hora:    {formatear_cop_lambda(s['tarifa_hora'])}\n")
+            txt_proc_out.insert("end", f" Calificación:   ★ {s.get('calificacion', 5.0):.1f} / 5.0 ({s.get('num_contratos', 0)} servicios)\n")
+            txt_proc_out.insert("end", f" Experiencia:    {s.get('anios_experiencia', 1)} año(s)\n")
+            txt_proc_out.insert("end", f" Disponibilidad: {'Inmediata (Activo)' if s.get('disponible', True) else 'Ocupado'}\n")
+            txt_proc_out.insert("end", f" Descripción:    {s.get('descripcion', 'Sin descripción')}\n")
+            txt_proc_out.insert("end", "=" * 65 + "\n")
+
+        def proc_ver_recibo():
+            idx = combo_serv.current()
+            if idx < 0 or idx >= len(servicios): return
+            s = servicios[idx]
+            liq = calcular_liquidacion_contrato(s["tarifa_hora"], 4, descuento_pct=10)
+            txt_proc_out.delete("1.0", "end")
+            txt_proc_out.insert("end", "=" * 65 + "\n")
+            txt_proc_out.insert("end", "      RECIBO DE COTIZACIÓN Y LIQUIDACIÓN — PLATAFORMA YPRI\n")
+            txt_proc_out.insert("end", "=" * 65 + "\n")
+            txt_proc_out.insert("end", f" Código Servicio:   {s['codigo']}\n")
+            txt_proc_out.insert("end", f" Categoría:         {s['categoria']}\n")
+            txt_proc_out.insert("end", f" Prestador:         {s['prestador_nombre']}\n")
+            txt_proc_out.insert("end", f" Ciudad:            {s['ciudad']}\n")
+            txt_proc_out.insert("end", "-" * 65 + "\n")
+            txt_proc_out.insert("end", f" Tarifa por hora:   {formatear_cop_lambda(liq['tarifa_hora'])}\n")
+            txt_proc_out.insert("end", f" Horas estimadas:   {liq['horas']} horas\n")
+            txt_proc_out.insert("end", f" Subtotal Bruto:    {formatear_cop_lambda(liq['subtotal_bruto'])}\n")
+            txt_proc_out.insert("end", f" Descuento ({liq['descuento_pct']}%):  - {formatear_cop_lambda(liq['monto_descuento'])}\n")
+            txt_proc_out.insert("end", f" Subtotal Neto:     {formatear_cop_lambda(liq['subtotal_neto'])}\n")
+            txt_proc_out.insert("end", f" IVA (19%):         + {formatear_cop_lambda(liq['monto_iva'])}\n")
+            txt_proc_out.insert("end", "-" * 65 + "\n")
+            txt_proc_out.insert("end", f" TOTAL A PAGAR:     {formatear_cop_lambda(liq['total_pagar'])}\n")
+            txt_proc_out.insert("end", "=" * 65 + "\n")
+
+        tk.Button(f_proc_sel, text="Ejecutar Ficha Técnica", font=("Segoe UI", 9, "bold"), bg=self.c_primary, fg="#FFFFFF", bd=0, padx=10, pady=4, command=proc_ver_ficha).pack(side="left", padx=4)
+        tk.Button(f_proc_sel, text="Ejecutar Recibo Liquidación", font=("Segoe UI", 9, "bold"), bg="#059669", fg="#FFFFFF", bd=0, padx=10, pady=4, command=proc_ver_recibo).pack(side="left", padx=4)
+        proc_ver_ficha()
+
+        # --------------------------------------------------------------------------------
+        # PESTAÑA 3: FUNCIONES LAMBDA (ACTIVIDAD 4)
+        # --------------------------------------------------------------------------------
+        tk.Label(
+            tab_lambdas,
+            text="Funciones Lambda para Cálculos y Criterios de Ordenamiento (sorted + key=lambda)",
+            font=("Segoe UI", 11, "bold"),
+            bg=self.c_card,
+            fg=self.c_primary
+        ).pack(anchor="w", pady=(0, 6))
+
+        f_lambda_btns = tk.Frame(tab_lambdas, bg=self.c_card)
+        f_lambda_btns.pack(fill="x", pady=4)
+
+        tree_l = ttk.Treeview(tab_lambdas, columns=("cod", "pres", "cat", "ciu", "tar", "rat"), show="headings", height=8)
+        tree_l.heading("cod", text="Código")
+        tree_l.heading("pres", text="Prestador")
+        tree_l.heading("cat", text="Categoría")
+        tree_l.heading("ciu", text="Ciudad")
+        tree_l.heading("tar", text="Tarifa/hora")
+        tree_l.heading("rat", text="Rating")
+        tree_l.column("cod", width=80)
+        tree_l.column("pres", width=150)
+        tree_l.column("cat", width=120)
+        tree_l.column("ciu", width=100)
+        tree_l.column("tar", width=110, anchor="e")
+        tree_l.column("rat", width=80, anchor="center")
+        tree_l.pack(fill="both", expand=True, pady=6)
+
+        def poblar_lambda(lista):
+            for item in tree_l.get_children(): tree_l.delete(item)
+            for s in lista:
+                tree_l.insert("", "end", values=(
+                    s["codigo"],
+                    s["prestador_nombre"],
+                    s["categoria"],
+                    s["ciudad"],
+                    formatear_cop_lambda(s["tarifa_hora"]),
+                    f"★ {s.get('calificacion', 5.0):.1f}"
+                ))
+
+        poblar_lambda(servicios)
+
+        tk.Button(
+            f_lambda_btns,
+            text="Ordenar por Tarifa Asc (lambda s: s['tarifa_hora'])",
+            font=("Segoe UI", 8, "bold"),
+            bg="#334155", fg="#FFFFFF", bd=0, padx=8, pady=4,
+            command=lambda: poblar_lambda(ordenar_servicios_por_tarifa(servicios, descendente=False))
+        ).pack(side="left", padx=4)
+
+        tk.Button(
+            f_lambda_btns,
+            text="Ordenar por Tarifa Desc (reverse=True)",
+            font=("Segoe UI", 8, "bold"),
+            bg="#334155", fg="#FFFFFF", bd=0, padx=8, pady=4,
+            command=lambda: poblar_lambda(ordenar_servicios_por_tarifa(servicios, descendente=True))
+        ).pack(side="left", padx=4)
+
+        tk.Button(
+            f_lambda_btns,
+            text="Ordenar por Calificación (lambda s: s['calificacion'])",
+            font=("Segoe UI", 8, "bold"),
+            bg=self.c_primary, fg="#FFFFFF", bd=0, padx=8, pady=4,
+            command=lambda: poblar_lambda(ordenar_servicios_por_rating(servicios))
+        ).pack(side="left", padx=4)
+
+        # --------------------------------------------------------------------------------
+        # PESTAÑA 4: VARIABLES & ARGUMENTOS (ACTIVIDAD 5)
+        # --------------------------------------------------------------------------------
+        tk.Label(
+            tab_argumentos,
+            text="Variables Locales, Globales y Comportamiento de Argumentos (Valor vs Referencia)",
+            font=("Segoe UI", 11, "bold"),
+            bg=self.c_card,
+            fg=self.c_primary
+        ).pack(anchor="w", pady=(0, 6))
+
+        f_arg_demo = tk.Frame(tab_argumentos, bg=self.c_card)
+        f_arg_demo.pack(fill="x", pady=6)
+
+        txt_arg_log = tk.Text(tab_argumentos, font=("Consolas", 9), height=14, bg="#0F172A", fg="#F8FAFC", padx=10, pady=8)
+        txt_arg_log.pack(fill="both", expand=True, pady=6)
+
+        def demo_inmutable():
+            txt_arg_log.delete("1.0", "end")
+            val_orig = 50000.0
+            txt_arg_log.insert("end", "[PRUEBA 1: TIPO INMUTABLE (float)]\n")
+            txt_arg_log.insert("end", f" Valor inicial antes de invocar modificar_numero_prueba: {val_orig}\n")
+            ret = modificar_numero_prueba(val_orig)
+            txt_arg_log.insert("end", f" Valor retornado por la función interna (n + 10000):   {ret}\n")
+            txt_arg_log.insert("end", f" Valor de la variable en el llamador tras la llamada:  {val_orig}\n")
+            txt_arg_log.insert("end", " -> RESULTADO: La variable original NO sufrió cambio alguno.\n")
+            txt_arg_log.insert("end", " -> En Python los números son inmutables; se comporta como paso por valor.\n\n")
+
+            cad_orig = "Bucaramanga"
+            txt_arg_log.insert("end", "[PRUEBA 2: TIPO INMUTABLE (cadena / str)]\n")
+            txt_arg_log.insert("end", f" Cadena inicial antes de invocar modificar_cadena_prueba: '{cad_orig}'\n")
+            ret_cad = modificar_cadena_prueba(cad_orig)
+            txt_arg_log.insert("end", f" Cadena retornada con .upper() + sufijo:                 '{ret_cad}'\n")
+            txt_arg_log.insert("end", f" Cadena original en el llamador:                         '{cad_orig}'\n")
+            txt_arg_log.insert("end", " -> RESULTADO: La cadena original conserva su valor intacto.\n")
+
+        def demo_mutable():
+            txt_arg_log.delete("1.0", "end")
+            lista_demo = ["Plomería", "Electricidad"]
+            txt_arg_log.insert("end", "[PRUEBA 3: TIPO MUTABLE (lista / list)]\n")
+            txt_arg_log.insert("end", f" Lista original antes de la llamada: {lista_demo} (id: {id(lista_demo)})\n")
+            agregar_elemento_lista_prueba(lista_demo, "Cerrajería")
+            txt_arg_log.insert("end", f" Lista original tras agregar_elemento_lista_prueba: {lista_demo} (id: {id(lista_demo)})\n")
+            txt_arg_log.insert("end", " -> RESULTADO: La lista original SÍ fue modificada in-place.\n")
+            txt_arg_log.insert("end", " -> En Python las listas son mutables; se comportan como paso por referencia.\n\n")
+
+            dict_demo = {"codigo": "SERV-099", "estado": "Activo"}
+            txt_arg_log.insert("end", "[PRUEBA 4: TIPO MUTABLE (diccionario / dict)]\n")
+            txt_arg_log.insert("end", f" Diccionario antes de la llamada: {dict_demo}\n")
+            actualizar_campo_diccionario_prueba(dict_demo, "estado", "Completado")
+            txt_arg_log.insert("end", f" Diccionario tras la llamada:      {dict_demo}\n")
+            txt_arg_log.insert("end", " -> RESULTADO: El diccionario cambió directamente en memoria.\n")
+
+        tk.Button(f_arg_demo, text="Probar Inmutables (int, float, str)", font=("Segoe UI", 9, "bold"), bg="#334155", fg="#FFFFFF", bd=0, padx=10, pady=4, command=demo_inmutable).pack(side="left", padx=4)
+        tk.Button(f_arg_demo, text="Probar Mutables (list, dict)", font=("Segoe UI", 9, "bold"), bg="#059669", fg="#FFFFFF", bd=0, padx=10, pady=4, command=demo_mutable).pack(side="left", padx=4)
+        demo_inmutable()
+
+        # --------------------------------------------------------------------------------
+        # PESTAÑA 5: INVENTARIO GUIADO (SECCIÓN 2 DE LA GUÍA 10)
+        # --------------------------------------------------------------------------------
+        from ejercicio_practico_guia10 import productos as prods_g10, calcular_subtotal as calc_sub_g10, calcular_total_inventario as calc_tot_g10
+
+        # Cargar productos semilla si esta vacio
+        if not prods_g10:
+            prods_g10.append({"codigo": "P01", "nombre": "Kit Herramientas Pro", "precio": 180000.0, "cantidad": 4})
+            prods_g10.append({"codigo": "P02", "nombre": "Multímetro Digital", "precio": 95000.0, "cantidad": 8})
+            prods_g10.append({"codigo": "P03", "nombre": "Taladro Percutor 750W", "precio": 250000.0, "cantidad": 3})
+
+        f_inv_top = tk.Frame(tab_inventario, bg=self.c_card)
+        f_inv_top.pack(fill="x", pady=(0, 6))
+
+        tk.Label(
+            f_inv_top,
+            text="Simulador Interactivo del Sistema de Inventario Guiado (Sección 2)",
+            font=("Segoe UI", 11, "bold"),
+            bg=self.c_card,
+            fg=self.c_primary
+        ).pack(anchor="w")
+
+        f_inv_form = tk.Frame(tab_inventario, bg=self.c_card)
+        f_inv_form.pack(fill="x", pady=4)
+
+        tk.Label(f_inv_form, text="Código:", font=("Segoe UI", 9), bg=self.c_card).grid(row=0, column=0, padx=4)
+        e_inv_cod = tk.Entry(f_inv_form, width=8); e_inv_cod.grid(row=0, column=1, padx=4)
+
+        tk.Label(f_inv_form, text="Nombre:", font=("Segoe UI", 9), bg=self.c_card).grid(row=0, column=2, padx=4)
+        e_inv_nom = tk.Entry(f_inv_form, width=16); e_inv_nom.grid(row=0, column=3, padx=4)
+
+        tk.Label(f_inv_form, text="Precio:", font=("Segoe UI", 9), bg=self.c_card).grid(row=0, column=4, padx=4)
+        e_inv_pre = tk.Entry(f_inv_form, width=10); e_inv_pre.grid(row=0, column=5, padx=4)
+
+        tk.Label(f_inv_form, text="Cantidad:", font=("Segoe UI", 9), bg=self.c_card).grid(row=0, column=6, padx=4)
+        e_inv_can = tk.Entry(f_inv_form, width=8); e_inv_can.grid(row=0, column=7, padx=4)
+
+        tree_inv = ttk.Treeview(tab_inventario, columns=("cod", "nom", "pre", "can", "sub"), show="headings", height=6)
+        tree_inv.heading("cod", text="Código")
+        tree_inv.heading("nom", text="Nombre")
+        tree_inv.heading("pre", text="Precio Unitario")
+        tree_inv.heading("can", text="Cantidad")
+        tree_inv.heading("sub", text="Subtotal")
+        tree_inv.column("cod", width=80)
+        tree_inv.column("nom", width=200)
+        tree_inv.column("pre", width=120, anchor="e")
+        tree_inv.column("can", width=80, anchor="center")
+        tree_inv.column("sub", width=140, anchor="e")
+        tree_inv.pack(fill="both", expand=True, pady=6)
+
+        lbl_inv_tot = tk.Label(tab_inventario, text="Valor Total Inventario: $0 COP", font=("Segoe UI", 11, "bold"), bg="#DBEAFE", fg=self.c_primary, padx=12, pady=6)
+        lbl_inv_tot.pack(anchor="e", pady=4)
+
+        def refrescar_tabla_inv(lista=None):
+            items = lista if lista is not None else prods_g10
+            for it in tree_inv.get_children(): tree_inv.delete(it)
+            for p in items:
+                sub = calc_sub_g10(p["precio"], p["cantidad"])
+                tree_inv.insert("", "end", values=(
+                    p["codigo"],
+                    p["nombre"],
+                    formatear_cop_lambda(p["precio"]),
+                    p["cantidad"],
+                    formatear_cop_lambda(sub)
+                ))
+            tot = calc_tot_g10()
+            lbl_inv_tot.config(text=f"Valor Total del Inventario: {formatear_cop_lambda(tot)}")
+
+        def agregar_prod_gui():
+            c = e_inv_cod.get().strip()
+            n = e_inv_nom.get().strip()
+            if not c or not n:
+                messagebox.showerror("Error", "Código y nombre son obligatorios.")
+                return
+            if any(p["codigo"] == c for p in prods_g10):
+                messagebox.showerror("Error", f"El código '{c}' ya existe.")
+                return
+            try:
+                p = float(e_inv_pre.get().strip())
+                can = int(e_inv_can.get().strip())
+                if p < 0 or can < 0:
+                    messagebox.showerror("Error", "Los valores no pueden ser negativos.")
+                    return
+                prods_g10.append({"codigo": c, "nombre": n, "precio": p, "cantidad": can})
+                e_inv_cod.delete(0, "end"); e_inv_nom.delete(0, "end"); e_inv_pre.delete(0, "end"); e_inv_can.delete(0, "end")
+                refrescar_tabla_inv()
+                messagebox.showinfo("Inventario", "Producto registrado correctamente.")
+            except ValueError:
+                messagebox.showerror("Error", "Precio y cantidad deben ser numéricos.")
+
+        def ordenar_inv_gui():
+            ordenados = sorted(prods_g10, key=lambda x: x["precio"])
+            refrescar_tabla_inv(ordenados)
+
+        tk.Button(f_inv_form, text="Registrar Producto", font=("Segoe UI", 8, "bold"), bg=self.c_primary, fg="#FFFFFF", bd=0, padx=10, pady=2, command=agregar_prod_gui).grid(row=0, column=8, padx=6)
+        tk.Button(f_inv_form, text="Ordenar por Precio (lambda)", font=("Segoe UI", 8, "bold"), bg="#334155", fg="#FFFFFF", bd=0, padx=10, pady=2, command=ordenar_inv_gui).grid(row=0, column=9, padx=6)
+        refrescar_tabla_inv()
 
     # ====================================================================================
     # VISTA 5: RETO DE INTEGRACION Y ANALISIS DEL VECTOR (GUIA 8 - ACTIVIDAD 13)

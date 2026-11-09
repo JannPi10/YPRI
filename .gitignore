@@ -16,6 +16,7 @@ eggs/
 .eggs/
 lib/
 lib64/
+!web/lib/
 parts/
 sdist/
 var/
@@ -49,3 +50,7 @@ out/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Microsoft Office temporary lock files
+~$*
+*.tmp

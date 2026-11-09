@@ -17,6 +17,9 @@ DOCUMENTACION DE TEMAS POR SEMANAS:
 - [SEMANA 9 - MATRICES EN PYTHON]:
   * Los contratos con estado 'Completado' alimentan la facturacion de las matrices
     semanales y por ciudad mediante la funcion de sincronizacion.
+- [SEMANA 10 - SUBALGORITMOS EN PYTHON]:
+  * Calculo modular de cotizacion con retorno estructurado (calcular_liquidacion_contrato).
+  * Procedimiento desacoplado de presentacion de recibo (mostrar_recibo_liquidacion).
 ========================================================================================
 """
 
@@ -30,6 +33,10 @@ from core.validaciones import (
     generar_id,
 )
 from data.database import contratos, servicios, get_sesion_actual
+from modules.subalgoritmos import (
+    calcular_liquidacion_contrato,
+    mostrar_recibo_liquidacion,
+)
 
 
 def solicitar_servicio():
@@ -79,19 +86,14 @@ def solicitar_servicio():
 
     horas = pedir_entero("  Numero de horas requeridas (1 - 100): ", 1, 100)
 
-    # Calculo aritmetico de cotizacion
-    subtotal = horas * servicio_sel["tarifa_hora"]
-    monto_iva = subtotal * IVA_PORCENTAJE
-    total = subtotal + monto_iva
+    # GUIA 10 - ACTIVIDAD 2 Y 6: Calculo modular mediante funcion con return
+    liq = calcular_liquidacion_contrato(servicio_sel["tarifa_hora"], horas)
+    subtotal = liq["subtotal_bruto"]
+    monto_iva = liq["monto_iva"]
+    total = liq["total_pagar"]
 
-    print(f"\n  --- RESUMEN DE COTIZACION ---")
-    print(f"  Servicio:   {servicio_sel['codigo']} - {servicio_sel['categoria']}")
-    print(f"  Prestador:  {servicio_sel['prestador_nombre']}")
-    print(f"  Horas:      {horas}")
-    print(f"  Subtotal:   ${subtotal:,.0f} COP")
-    print(f"  IVA (19%):  ${monto_iva:,.0f} COP")
-    print(f"  TOTAL:      ${total:,.0f} COP")
-    separador()
+    # GUIA 10 - ACTIVIDAD 3 Y 6: Presentacion modular mediante procedimiento
+    mostrar_recibo_liquidacion(liq, servicio=servicio_sel)
 
     confirmar = pedir_sn("  ¿Confirmar la contratacion? (s/n): ")
     if confirmar == "n":

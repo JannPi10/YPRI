@@ -15,6 +15,8 @@ DOCUMENTACION DE TEMAS POR SEMANAS:
 - [SEMANA 9 - MATRICES EN PYTHON]:
   * Las calificaciones y contratos completados respaldan la confiabilidad de los datos
     registrados en la matriz analitica de facturacion.
+- [SEMANA 10 - SUBALGORITMOS EN PYTHON]:
+  * Recalculo matematico del rating mediante funcion pura con return (calcular_promedio_calificacion).
 ========================================================================================
 """
 
@@ -30,6 +32,7 @@ from data.database import (
     calificaciones,
     get_sesion_actual,
 )
+from modules.subalgoritmos import calcular_promedio_calificacion
 
 
 def calificar_servicio():
@@ -87,14 +90,12 @@ def calificar_servicio():
     contrato_cal["calificacion"] = puntuacion
     contrato_cal["comentario"] = comentario
 
-    # Recalculo matematico del promedio de calificacion del servicio
+    # GUIA 10 - ACTIVIDAD 2 Y 6: Recalculo modular mediante funcion con return
     for serv in servicios:
         if serv["codigo"] == contrato_cal["servicio_codigo"]:
             n_contratos = max(1, serv.get("num_contratos", 1))
             rating_previo = serv.get("calificacion", 5.0)
-            # Promedio ponderado
-            nuevo_promedio = ((rating_previo * (n_contratos - 1)) + puntuacion) / n_contratos
-            serv["calificacion"] = round(nuevo_promedio, 1)
+            serv["calificacion"] = calcular_promedio_calificacion(rating_previo, n_contratos, puntuacion)
             break
 
     # Creacion del registro en la coleccion de calificaciones
