@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
+import Image from "next/image";
 import { Briefcase, MapPin, Plus } from "lucide-react";
 import { Button, Card, cx, EmptyState, escalonado, PageHeader, useToast } from "@/components/ui";
 import { CATEGORIA_LABEL, CIUDAD_LABEL } from "@/lib/constants";
@@ -30,6 +31,18 @@ export function MyServicesView({ usuario }: { usuario: Usuario }) {
         descripcion="Controla qué servicios ven los clientes y cuándo estás disponible."
         acciones={servicios.length > 0 && botonPublicar}
       />
+
+      <div className="relative mb-6 flex min-h-[150px] animate-fade-up items-center overflow-hidden rounded-[28px] bg-[#0A1320] text-white">
+        <div className="relative z-10 max-w-[62%] p-6">
+          <p className="text-[13px] font-bold text-accent">Talento al toque</p>
+          <p className="mt-1 text-xl font-extrabold leading-tight sm:text-2xl">Tu oficio, al alcance de quien lo necesita</p>
+          <p className="mt-1 hidden text-sm text-white/70 sm:block">Mantén tus servicios activos para recibir solicitudes cerca de ti.</p>
+        </div>
+        <div className="absolute inset-y-0 right-0 w-[42%]">
+          <Image src="/images/ilustraciones/prestador.png" alt="" fill sizes="(max-width: 768px) 42vw, 360px" className="object-cover object-[center_30%]" />
+          <div aria-hidden className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0A1320] to-transparent" />
+        </div>
+      </div>
 
       {servicios.length ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

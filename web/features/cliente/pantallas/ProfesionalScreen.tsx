@@ -103,7 +103,7 @@ export function ProfesionalScreen({ codigo, onVolver, onReservar, onAbrirServici
           prestador?.telefono && (
             <a
               href={`tel:${prestador.telefono}`}
-              className="touch-feedback mx-auto inline-flex h-11 w-full max-w-xs items-center justify-center gap-2 rounded-xl border border-border bg-card text-sm font-semibold hover:bg-muted"
+              className="touch-feedback mx-auto inline-flex h-12 w-full max-w-xs items-center justify-center gap-2 rounded-full border-[1.5px] border-foreground/85 bg-card text-sm font-bold hover:bg-muted"
             >
               <Phone className="h-4 w-4" aria-hidden />
               Llamar a {servicio.prestador_nombre.split(" ")[0]}

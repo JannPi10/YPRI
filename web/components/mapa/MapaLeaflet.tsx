@@ -65,7 +65,7 @@ function ClicEnMapa({ onClic }: { onClic?: (c: Coordenadas) => void }) {
 
 export default function MapaLeaflet({ centro, zoom = 13, marcadores, circulos = [], ruta, ajustar = true, seguir, onClicMapa, etiqueta, alto = 260 }: PropsMapa) {
   const puntos = useMemo(() => marcadores.map((m) => m.coordenadas), [marcadores]);
-  const color = { profesional: "#003151", movil: "#3dca8d" };
+  const color = { profesional: "#0F1B2D", movil: "#F2A93B" };
 
   return (
     <div role="region" aria-label={etiqueta} className="ypri-mapa relative isolate overflow-hidden rounded-2xl border border-border" style={{ height: alto }}>
@@ -80,7 +80,7 @@ export default function MapaLeaflet({ centro, zoom = 13, marcadores, circulos = 
             key={c.id}
             center={aLatLng(c.centro)}
             radius={c.radioKm * 1000}
-            pathOptions={{ color: color.profesional, weight: 1, opacity: 0.4, fillColor: "#3dca8d", fillOpacity: 0.08 }}
+            pathOptions={{ color: color.profesional, weight: 1, opacity: 0.4, fillColor: "#F2A93B", fillOpacity: 0.1 }}
           />
         ))}
         {ruta && <Polyline positions={ruta.map(aLatLng)} pathOptions={{ color: color.movil, weight: 4, opacity: 0.9, dashArray: "8 8" }} />}

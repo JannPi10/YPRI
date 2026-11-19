@@ -100,7 +100,7 @@ export function BarraBusqueda({
   };
   return (
     <form role="search" onSubmit={enviar} className={cx("px-4 py-2", className)}>
-      <label className={cx("flex items-center gap-3 rounded-2xl bg-muted px-4 py-3 transition-all duration-200 focus-within:bg-card focus-within:shadow-suave focus-within:ring-2 focus-within:ring-accent", claseCampo)}>
+      <label className={cx("flex items-center gap-3 rounded-2xl bg-muted px-4 py-3 transition-all duration-200 focus-within:bg-card focus-within:shadow-suave focus-within:ring-2 focus-within:ring-enfasis", claseCampo)}>
         <Search className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
         <span className="sr-only">Buscar servicios</span>
         <input
@@ -141,13 +141,13 @@ export function CarruselCategorias({
           >
             <span
               className={cx(
-                "flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-200 group-hover:-translate-y-0.5",
+                "flex h-[58px] w-[58px] items-center justify-center rounded-full transition-all duration-200 group-hover:-translate-y-0.5",
                 activa ? "bg-primary shadow-lg" : "bg-muted group-hover:bg-primary-soft",
               )}
             >
               <Icono className={cx("h-6 w-6 transition-colors", activa ? "text-primary-foreground" : "text-foreground group-hover:text-enfasis")} aria-hidden />
             </span>
-            <span className={cx("text-center text-xs font-medium", activa ? "text-enfasis" : "text-muted-foreground")}>{CATEGORIA_LABEL[categoria]}</span>
+            <span className={cx("text-center text-xs font-bold", activa ? "text-enfasis" : "text-foreground")}>{CATEGORIA_LABEL[categoria]}</span>
           </button>
         );
       })}
@@ -162,8 +162,8 @@ export function ChipFiltro({ activa, onClick, children }: { activa: boolean; onC
       aria-pressed={activa}
       onClick={onClick}
       className={cx(
-        "touch-feedback shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-200",
-        activa ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground hover:border-muted-foreground/40",
+        "touch-feedback shrink-0 rounded-full border-2 px-4 py-1.5 text-sm font-bold transition-colors duration-200",
+        activa ? "border-primary bg-primary text-primary-foreground" : "border-foreground/85 bg-card text-foreground hover:bg-muted",
       )}
     >
       {children}
@@ -174,9 +174,9 @@ export function ChipFiltro({ activa, onClick, children }: { activa: boolean; onC
 export function EncabezadoSeccion({ titulo, accion, onAccion }: { titulo: string; accion?: string; onAccion?: () => void }) {
   return (
     <div className="mb-3 flex items-center justify-between px-4">
-      <h2 className="text-base font-semibold">{titulo}</h2>
+      <h2 className="text-lg font-extrabold tracking-tight">{titulo}</h2>
       {accion && onAccion && (
-        <button type="button" onClick={onAccion} className="touch-feedback text-sm font-medium text-accent-strong hover:underline">
+        <button type="button" onClick={onAccion} className="touch-feedback text-sm font-bold text-enfasis hover:underline">
           {accion}
         </button>
       )}
@@ -187,12 +187,13 @@ export function EncabezadoSeccion({ titulo, accion, onAccion }: { titulo: string
 /* ---------------------------------------------------------- Profesionales */
 
 export function AvatarProfesional({ servicio, tamano = "md" }: { servicio: Servicio; tamano?: "md" | "lg" | "xl" }) {
-  const clases = { md: "h-16 w-16 rounded-xl text-lg", lg: "h-20 w-20 rounded-2xl text-xl", xl: "h-28 w-28 rounded-full text-3xl" }[tamano];
+  const clases = { md: "h-16 w-16 rounded-2xl text-lg", lg: "h-20 w-20 rounded-3xl text-xl", xl: "h-28 w-28 rounded-full text-3xl ring-4 ring-card" }[tamano];
+  const color = tamano === "xl" ? "bg-accent text-accent-foreground" : "bg-primary-soft text-enfasis";
   return (
-    <span aria-hidden className={cx("relative flex shrink-0 items-center justify-center bg-primary-soft font-semibold text-enfasis", clases)}>
+    <span aria-hidden className={cx("relative flex shrink-0 items-center justify-center font-extrabold", color, clases)}>
       {iniciales(servicio.prestador_nombre)}
       {servicio.disponible && (
-        <span className={cx("absolute rounded-full border-2 border-card bg-accent", tamano === "xl" ? "bottom-2 right-2 h-5 w-5" : "bottom-1 right-1 h-3 w-3")} />
+        <span className={cx("absolute rounded-full border-2 border-card", tamano === "xl" ? "bottom-2 right-2 h-5 w-5 bg-primary" : "bottom-1 right-1 h-3 w-3 bg-accent")} />
       )}
     </span>
   );
@@ -228,9 +229,9 @@ export function TarjetaDestacada({
       type="button"
       onClick={() => onAbrir(servicio)}
       style={style}
-      className="group touch-feedback hover-elevar relative flex w-[min(78vw,280px)] shrink-0 animate-fade-up flex-col overflow-hidden rounded-2xl border border-border bg-card text-left md:w-full"
+      className="group touch-feedback hover-elevar relative flex w-[min(78vw,280px)] shrink-0 animate-fade-up flex-col overflow-hidden rounded-3xl border border-border bg-card text-left md:w-full"
     >
-      <span className="relative flex h-28 w-full items-center justify-center overflow-hidden bg-gradient-to-br from-primary to-primary/80">
+      <span className="relative flex h-28 w-full items-center justify-center overflow-hidden bg-[#0A1320]">
         <span aria-hidden className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-accent/20 blur-xl" />
         <Icono className="h-12 w-12 text-accent transition-transform duration-300 group-hover:scale-110" aria-hidden />
         <span className="absolute left-3 top-3 rounded-full bg-card/90 px-2 py-0.5 text-[10px] font-semibold text-enfasis">

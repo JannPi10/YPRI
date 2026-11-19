@@ -17,7 +17,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        sans: ["var(--font-urbanist)", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
       },
       colors: {
         background: token("background"),
@@ -34,8 +34,8 @@ module.exports = {
         destructive: token("destructive"),
       },
       boxShadow: {
-        suave: "0 1px 2px rgb(0 49 81 / 0.04), 0 4px 16px -4px rgb(0 49 81 / 0.08)",
-        elevada: "0 8px 30px -8px rgb(0 49 81 / 0.25)",
+        suave: "0 1px 2px rgb(10 19 32 / 0.04), 0 4px 16px -4px rgb(10 19 32 / 0.08)",
+        elevada: "0 8px 30px -8px rgb(10 19 32 / 0.25)",
       },
       keyframes: {
         "fade-in": { from: { opacity: "0" }, to: { opacity: "1" } },

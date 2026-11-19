@@ -117,7 +117,7 @@ export function ReservarScreen({ codigo, onVolver, onConfirmada }: Props) {
             </Field>
             <div>
               <p className="mb-1.5 text-sm font-medium text-foreground">Horas estimadas</p>
-              <div className="flex h-14 items-center rounded-xl border border-border bg-card">
+              <div className="flex h-14 items-center rounded-full bg-muted">
                 <button
                   type="button"
                   onClick={() => ajustarHoras(-1)}
@@ -149,7 +149,7 @@ export function ReservarScreen({ codigo, onVolver, onConfirmada }: Props) {
           <>
             <div>
               <p className="mb-1.5 text-sm font-medium">Ubicación en el mapa</p>
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-2 pr-3">
+              <div className="flex items-center justify-between gap-3 rounded-2xl bg-muted p-2 pr-3">
                 <BotonUbicacion className="py-1 pl-1 pr-2" />
                 <span className="shrink-0 text-right text-xs text-muted-foreground">
                   a {formatearDistancia(cercania.distanciaKm)}

@@ -10,9 +10,9 @@ import { AlertCircle } from "lucide-react";
 import { cx } from "./cx";
 
 const CONTROL =
-  "w-full rounded-xl border border-border bg-card px-3.5 text-sm text-foreground placeholder:text-muted-foreground/70 " +
-  "transition-shadow focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/20 " +
-  "disabled:bg-muted disabled:text-muted-foreground aria-[invalid=true]:border-red-400";
+  "w-full rounded-2xl border-2 border-transparent bg-muted px-4 text-sm font-medium text-foreground placeholder:font-normal placeholder:text-muted-foreground " +
+  "transition-colors focus:border-enfasis focus:bg-card focus:outline-none " +
+  "disabled:opacity-60 aria-[invalid=true]:border-red-400";
 
 interface FieldProps {
   etiqueta: string;
@@ -28,7 +28,7 @@ export function Field({ etiqueta, ayuda, error, className, children }: FieldProp
   const idDescripcion = error || ayuda ? `${id}-descripcion` : undefined;
   return (
     <div className={className}>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label htmlFor={id} className="mb-1.5 block text-sm font-bold text-foreground">
         {etiqueta}
       </label>
       {children({ id, "aria-describedby": idDescripcion, "aria-invalid": error ? true : undefined })}
@@ -42,15 +42,15 @@ export function Field({ etiqueta, ayuda, error, className, children }: FieldProp
 }
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...props }, ref) {
-  return <input ref={ref} className={cx(CONTROL, "h-11", className)} {...props} />;
+  return <input ref={ref} className={cx(CONTROL, "h-[52px]", className)} {...props} />;
 });
 
 export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select className={cx(CONTROL, "h-11 pr-9", className)} {...props} />;
+  return <select className={cx(CONTROL, "h-[52px] pr-9", className)} {...props} />;
 }
 
 export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea className={cx(CONTROL, "py-2.5", className)} {...props} />;
+  return <textarea className={cx(CONTROL, "py-3", className)} {...props} />;
 }
 
 export function FormError({ mensaje }: { mensaje: string | null }) {

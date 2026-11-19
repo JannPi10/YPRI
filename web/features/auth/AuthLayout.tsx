@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
-import { BadgeCheck, KeyRound, Receipt, Scissors, Snowflake, Sparkles, Star, Wrench, Zap } from "lucide-react";
+import Image from "next/image";
+import { BadgeCheck, Receipt, Star } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { SelectorTema } from "@/components/layout/Tema";
 import { escalonado } from "@/components/ui";
-
-const CATEGORIAS = [Zap, Wrench, Sparkles, Snowflake, KeyRound, Scissors];
 
 const VENTAJAS = [
   { icono: BadgeCheck, titulo: "Profesionales verificados", texto: "Perfiles revisados por YPRI antes de recibir solicitudes." },
@@ -12,56 +11,57 @@ const VENTAJAS = [
   { icono: Star, titulo: "Calificaciones reales", texto: "Cada reseña viene de un servicio completado en la plataforma." },
 ];
 
-/** Marco de las pantallas de acceso: encabezado azul en móvil y pantalla dividida en escritorio. */
+const EQUIPO = "/images/ilustraciones/equipo.png";
+const ALT_EQUIPO = "Equipo de profesionales de YPRI: electricista, plomera, limpieza y cerrajera";
+
+/** Marco de las pantallas de acceso: encabezado azul noche en móvil y pantalla dividida en escritorio. */
 export function AuthLayout({ titulo, descripcion, children }: { titulo: string; descripcion: string; children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       {/* Panel de marca (solo escritorio) */}
-      <aside className="relative hidden overflow-hidden bg-primary p-12 text-primary-foreground lg:flex lg:flex-col">
-        <div aria-hidden className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
-        <div aria-hidden className="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-white/5 blur-2xl" />
-        <Logo claro prioridad />
-        <div className="relative my-auto max-w-md py-12">
-          <h2 className="animate-fade-up text-4xl font-bold leading-tight tracking-tight">
-            Profesionales de confianza, <span className="text-accent">a domicilio</span>.
+      <aside className="relative hidden overflow-hidden bg-[#0A1320] p-12 text-white lg:flex lg:flex-col">
+        <Logo claro conLema prioridad />
+        <div className="relative my-auto max-w-md py-10">
+          <h2 className="animate-fade-up text-5xl font-extrabold leading-[1.05] tracking-tight">
+            Talento
+            <br />
+            <span className="text-accent">al toque</span>
           </h2>
-          <p className="mt-4 animate-fade-up text-primary-foreground/75" style={escalonado(1, 80)}>
+          <p className="mt-4 animate-fade-up text-white/70" style={escalonado(1, 80)}>
             Electricidad, plomería, limpieza, climatización, cerrajería y belleza en las principales ciudades de Colombia.
           </p>
-          <div className="mt-8 flex gap-3">
-            {CATEGORIAS.map((Icono, i) => (
-              <span key={i} className="flex h-12 w-12 animate-pop items-center justify-center rounded-2xl bg-white/10" style={escalonado(i + 2, 70)}>
-                <Icono className="h-5 w-5 text-accent" aria-hidden />
-              </span>
-            ))}
+          <div className="relative mt-8 aspect-[16/9] animate-fade-up overflow-hidden rounded-[2rem]" style={escalonado(2, 80)}>
+            <Image src={EQUIPO} alt={ALT_EQUIPO} fill priority sizes="(min-width: 1024px) 448px, 0px" className="object-cover object-[center_20%]" />
           </div>
-          <ul className="mt-10 space-y-5">
+          <ul className="mt-8 space-y-5">
             {VENTAJAS.map(({ icono: Icono, titulo: t, texto }, i) => (
-              <li key={t} className="flex animate-fade-up gap-4" style={escalonado(i + 6, 80)}>
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+              <li key={t} className="flex animate-fade-up gap-4" style={escalonado(i + 3, 80)}>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
                   <Icono className="h-5 w-5" aria-hidden />
                 </span>
                 <span>
-                  <span className="block font-semibold">{t}</span>
-                  <span className="block text-sm text-primary-foreground/70">{texto}</span>
+                  <span className="block font-bold">{t}</span>
+                  <span className="block text-sm text-white/65">{texto}</span>
                 </span>
               </li>
             ))}
           </ul>
         </div>
-        <p className="relative text-xs text-primary-foreground/50">YPRI · Plataforma de servicios a domicilio</p>
+        <p className="relative text-xs text-white/45">YPRI · Talento al toque</p>
       </aside>
 
       {/* Formulario */}
       <div className="flex min-h-screen flex-col">
-        <header className="relative overflow-hidden rounded-b-[2rem] bg-primary px-6 pb-16 pt-8 text-primary-foreground lg:hidden">
-          <div aria-hidden className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/20 blur-2xl" />
+        <header className="relative overflow-hidden rounded-b-[2rem] bg-[#0A1320] px-6 pb-16 pt-8 text-white lg:hidden">
           <div className="relative flex items-center justify-between gap-3">
-            <Logo claro prioridad />
+            <Logo claro conLema prioridad />
             <SelectorTema sobreOscuro />
           </div>
-          <h1 className="relative mt-8 animate-fade-up text-2xl font-bold tracking-tight">{titulo}</h1>
-          <p className="relative mt-1 animate-fade-up text-sm text-primary-foreground/75" style={escalonado(1, 80)}>
+          <div className="relative mt-6 h-36 overflow-hidden rounded-3xl">
+            <Image src={EQUIPO} alt={ALT_EQUIPO} fill priority sizes="(max-width: 1023px) 100vw, 0px" className="object-cover object-[center_24%]" />
+          </div>
+          <h1 className="relative mt-6 animate-fade-up text-3xl font-extrabold tracking-tight">{titulo}</h1>
+          <p className="relative mt-1 animate-fade-up text-sm text-white/70" style={escalonado(1, 80)}>
             {descripcion}
           </p>
         </header>
@@ -71,7 +71,7 @@ export function AuthLayout({ titulo, descripcion, children }: { titulo: string; 
               <SelectorTema />
             </div>
             <div className="mb-8 hidden lg:block">
-              <h1 className="text-3xl font-bold tracking-tight">{titulo}</h1>
+              <h1 className="text-4xl font-extrabold tracking-tight">{titulo}</h1>
               <p className="mt-2 text-muted-foreground">{descripcion}</p>
             </div>
             {children}

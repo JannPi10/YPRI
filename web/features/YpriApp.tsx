@@ -1,19 +1,41 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
+import { Logo } from "@/components/layout/Logo";
 import { useToast } from "@/components/ui";
 import { puedeVerVista, usaAppMovil, vistaInicial, vistasPermitidas, type VistaId } from "@/lib/domain/navigation";
 import { useAppStore } from "@/store/AppStore";
 import { useSesion } from "@/store/hooks";
+import { Bienvenida } from "./auth/Bienvenida";
 import { LoginView } from "./auth/LoginView";
 import { RegisterView } from "./auth/RegisterView";
 import { ClienteApp } from "./cliente/ClienteApp";
 import { REGISTRO_VISTAS } from "./viewRegistry";
 
+/** Marca en el navegador que la persona ya vio el recorrido de bienvenida. */
+const CLAVE_BIENVENIDA = "ypri:bienvenida-vista";
+
 export function YpriApp() {
   const { hidratado } = useAppStore();
+  // null mientras se consulta el navegador; así no parpadea la pantalla equivocada.
+  const [bienvenidaPendiente, setBienvenidaPendiente] = useState<boolean | null>(null);
+  useEffect(() => {
+    try {
+      setBienvenidaPendiente(window.localStorage.getItem(CLAVE_BIENVENIDA) !== "1");
+    } catch {
+      setBienvenidaPendiente(false);
+    }
+  }, []);
+  const cerrarBienvenida = (destino: "login" | "registro") => {
+    try {
+      window.localStorage.setItem(CLAVE_BIENVENIDA, "1");
+    } catch {
+      // Sin almacenamiento disponible, el recorrido simplemente vuelve a mostrarse la próxima vez.
+    }
+    setBienvenidaPendiente(false);
+    setPantallaAcceso(destino);
+  };
   const { usuarioActual, cerrarSesion } = useSesion();
   const toast = useToast();
   const [pantallaAcceso, setPantallaAcceso] = useState<"login" | "registro">("login");
@@ -27,15 +49,18 @@ export function YpriApp() {
     setVista(vistaInicial(usuarioActual));
   }
 
-  if (!hidratado) {
+  if (!hidratado || bienvenidaPendiente === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-primary" aria-busy="true" aria-label="Cargando YPRI">
-        <Image src="/images/ypri-icon.png" alt="" width={72} height={72} priority className="h-[72px] w-[72px] animate-pulso-suave rounded-2xl" />
+      <div className="flex min-h-screen items-center justify-center bg-[#0A1320]" aria-busy="true" aria-label="Cargando YPRI">
+        <Logo claro conLema className="animate-pulso-suave scale-125" />
       </div>
     );
   }
 
   if (!usuarioActual) {
+    if (bienvenidaPendiente) {
+      return <Bienvenida onIngresar={() => cerrarBienvenida("login")} onRegistrarse={() => cerrarBienvenida("registro")} />;
+    }
     return pantallaAcceso === "login" ? (
       <LoginView onIrARegistro={() => setPantallaAcceso("registro")} />
     ) : (

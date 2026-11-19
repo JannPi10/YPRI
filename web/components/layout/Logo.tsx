@@ -1,18 +1,22 @@
-import Image from "next/image";
 import { cx } from "@/components/ui";
 
 /**
- * Logo de YPRI. Sobre fondos claros usa el logotipo completo; sobre el azul
- * marino (claro) usa el ícono con el nombre en blanco.
+ * Marca de YPRI: símbolo ámbar con la «Y», el nombre y, si se pide, el lema.
+ * Con `claro` el texto va en blanco para usarlo sobre el azul noche.
  */
-export function Logo({ claro, className, prioridad }: { claro?: boolean; className?: string; prioridad?: boolean }) {
-  if (claro) {
-    return (
-      <span className={cx("inline-flex items-center gap-2.5", className)}>
-        <Image src="/images/ypri-icon.png" alt="" width={36} height={36} priority={prioridad} className="h-9 w-9 rounded-xl ring-1 ring-white/15" />
-        <span className="text-xl font-bold tracking-tight text-white">YPRI</span>
+export function Logo({ claro, className, conLema }: { claro?: boolean; className?: string; prioridad?: boolean; conLema?: boolean }) {
+  return (
+    <span className={cx("inline-flex items-center gap-2.5", className)}>
+      <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 4l7 9 7-9" />
+          <path d="M12 13v7" />
+        </svg>
       </span>
-    );
-  }
-  return <Image src="/images/ypri-logo.png" alt="YPRI" width={94} height={32} priority={prioridad} className={cx("h-8 w-auto dark:brightness-0 dark:invert", className)} />;
+      <span className="flex flex-col leading-none">
+        <span className={cx("text-xl font-extrabold tracking-wide", claro ? "text-white" : "text-foreground")}>YPRI</span>
+        {conLema && <span className={cx("mt-1 text-[11px] font-semibold", claro ? "text-white/70" : "text-muted-foreground")}>Talento al toque</span>}
+      </span>
+    </span>
+  );
 }

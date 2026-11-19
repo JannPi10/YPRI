@@ -2,7 +2,7 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { cx } from "./cx";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cx("rounded-2xl border border-border bg-card shadow-suave", className)} {...props} />;
+  return <div className={cx("rounded-3xl border border-border bg-card shadow-suave", className)} {...props} />;
 }
 
 interface CardHeaderProps {

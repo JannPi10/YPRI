@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, MapPinOff, Zap } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, CalendarDays, MapPinOff } from "lucide-react";
 import { Mapa, type MarcadorMapa } from "@/components/mapa/Mapa";
 import { CIUDAD_LABEL, type CategoriaServicio } from "@/lib/constants";
 import { calcularCercania, serviciosCercanos } from "@/lib/domain/cercania";
@@ -71,16 +72,31 @@ export function InicioScreen({ usuario, onBuscar, onAbrirServicio, onVerReservas
             className="lg:px-0 lg:pb-0 lg:pt-6"
             claseCampo="lg:bg-card lg:py-4 lg:shadow-elevada"
           />
-          <div className="flex items-center gap-2 px-4 pb-1 pt-1 lg:px-0 lg:pt-4">
+          <div className="px-4 pb-1 pt-2 lg:px-0 lg:pt-5">
             <button
               type="button"
               onClick={() => onPedirAhora(undefined, "")}
-              className="touch-feedback inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm hover:bg-accent/90"
+              className="touch-feedback group relative flex h-[150px] w-full items-end overflow-hidden rounded-[28px] bg-[#0A1320] p-5 text-left text-white ring-1 ring-white/10"
             >
-              <Zap className="h-4 w-4" aria-hidden />
-              Necesito a alguien ya
+              <Image
+                src="/images/ilustraciones/van.png"
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 100vw, 640px"
+                className="object-cover object-[right_55%] transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+              <span className="relative flex flex-col items-start gap-1">
+                <span className="text-[13px] font-bold text-accent">Pedido inmediato</span>
+                <span className="text-4xl font-extrabold leading-none">
+                  {cercanos.length ? `~${formatearTiempo(cercanos[0].minutos)}` : "Al instante"}
+                </span>
+                <span className="mt-1 inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-3.5 text-sm font-extrabold text-accent-foreground">
+                  Pedir ahora
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </span>
+              </span>
             </button>
-            <span className="text-xs text-muted-foreground lg:text-primary-foreground/70">Te asignamos al operario libre más cercano</span>
+            <p className="mt-2 text-xs text-muted-foreground lg:text-primary-foreground/70">Te asignamos al operario libre más cercano.</p>
           </div>
         </div>
 

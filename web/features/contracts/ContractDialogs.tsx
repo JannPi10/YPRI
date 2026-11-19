@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button, Field, FormError, Modal, SelectorEstrellas, Textarea } from "@/components/ui";
 import type { Contrato } from "@/lib/types";
 
@@ -36,6 +37,9 @@ export function RateDialog({
       }
     >
       <div className="space-y-4">
+        <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-[2rem] bg-[#F4F5F7]">
+          <Image src="/images/ilustraciones/resena.png" alt="" fill sizes="160px" className="object-cover" />
+        </div>
         <div className="flex flex-col items-center gap-1">
           <SelectorEstrellas valor={puntuacion} onCambiar={setPuntuacion} />
           <p className="text-sm font-medium text-foreground/80">{DESCRIPCION_NOTA[puntuacion]}</p>

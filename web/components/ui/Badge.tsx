@@ -6,23 +6,23 @@ export type Tono = "neutral" | "blue" | "green" | "amber" | "red";
 
 const TONOS: Record<Tono, string> = {
   neutral: "bg-muted text-muted-foreground",
-  blue: "bg-sky-100 text-sky-800 dark:bg-sky-400/15 dark:text-sky-300",
-  green: "bg-emerald-100 text-emerald-800 dark:bg-emerald-400/15 dark:text-emerald-300",
-  amber: "bg-amber-100 text-amber-800 dark:bg-amber-400/15 dark:text-amber-300",
+  blue: "bg-accent text-accent-foreground",
+  green: "bg-primary text-primary-foreground",
+  amber: "border-[1.5px] border-foreground/80 text-foreground",
   red: "bg-red-100 dark:bg-red-500/15 text-red-700 dark:text-red-300",
 };
 
 const PUNTOS: Record<Tono, string> = {
   neutral: "bg-muted-foreground",
-  blue: "bg-sky-600",
-  green: "bg-emerald-600",
-  amber: "bg-amber-500",
+  blue: "bg-accent-foreground",
+  green: "bg-accent",
+  amber: "bg-accent-strong",
   red: "bg-red-600",
 };
 
 export function Badge({ tono = "neutral", conPunto, children }: { tono?: Tono; conPunto?: boolean; children: ReactNode }) {
   return (
-    <span className={cx("inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium", TONOS[tono])}>
+    <span className={cx("inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold", TONOS[tono])}>
       {conPunto && <span className={cx("h-1.5 w-1.5 rounded-full", PUNTOS[tono])} aria-hidden />}
       {children}
     </span>
