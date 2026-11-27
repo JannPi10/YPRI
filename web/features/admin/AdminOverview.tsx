@@ -1,0 +1,166 @@
+"use client";
+
+import { useState } from "react";
+import { Activity, Banknote, Star, TrendingUp, Users } from "lucide-react";
+import { Mapa } from "@/components/mapa/Mapa";
+import { Avatar, BarrasHorizontales, Card, Select, CardHeader, escalonado, EstadoContratoBadge, PageHeader, StatCard, Table, Td, Th } from "@/components/ui";
+import { CATEGORIA_LABEL, CATEGORIAS_MATRIZ, CIUDAD_LABEL, CIUDADES_COBERTURA, ESTADOS_CONTRATO, type CiudadCobertura } from "@/lib/constants";
+import { CENTRO_CIUDAD } from "@/lib/zonas";
+import { analizarMatriz } from "@/lib/matrices";
+import { ESTADOS_ACTIVOS } from "@/lib/domain/contracts";
+import { calcularComisionPlataforma, sumarTotales } from "@/lib/finance";
+import { formatearCalificacion, formatearFecha, formatearMoneda, iniciales, pluralizar } from "@/lib/format";
+import { useAppStore } from "@/store/AppStore";
+
+const ULTIMOS_CONTRATOS = 5;
+
+export function AdminOverview() {
+  const { data } = useAppStore();
+  const completados = data.contratos.filter((c) => c.estado === "Completado");
+  const activos = data.contratos.filter((c) => ESTADOS_ACTIVOS.includes(c.estado));
+  const valorTransado = sumarTotales(completados, (c) => c.total);
+  const comisiones = sumarTotales(completados, (c) => calcularComisionPlataforma(c.total).comisionYpri);
+  const profesionales = data.usuarios.filter((u) => u.rol === "prestador" && u.activo).length;
+  const clientes = data.usuarios.filter((u) => u.rol === "cliente" && u.activo).length;
+  const semanal = analizarMatriz(data.matrizSemanal);
+  const mejorCalificados = [...data.servicios]
+    .filter((s) => s.num_resenas > 0)
+    .sort((a, b) => b.calificacion - a.calificacion || b.num_resenas - a.num_resenas)
+    .slice(0, 5);
+
+  return (
+    <>
+      <PageHeader titulo="Resumen de la plataforma" descripcion="Actividad, usuarios y desempeño de los servicios." />
+
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard destacado icono={Banknote} style={escalonado(0)} etiqueta="Valor transado" valor={formatearMoneda(valorTransado)} detalle={`${completados.length} servicios completados`} />
+        <StatCard icono={TrendingUp} tono="accent" style={escalonado(1)} etiqueta="Ingresos por comisión" valor={formatearMoneda(comisiones)} detalle="Sobre servicios completados" />
+        <StatCard icono={Activity} style={escalonado(2)} etiqueta="Servicios en curso" valor={activos.length} detalle="Pendientes y en proceso" />
+        <StatCard icono={Users} tono="neutral" style={escalonado(3)} etiqueta="Usuarios activos" valor={clientes + profesionales} detalle={`${clientes} clientes · ${profesionales} profesionales`} />
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card className="animate-fade-up p-5" style={escalonado(4)}>
+          <h3 className="text-base font-semibold">Ingresos de la semana por categoría</h3>
+          <p className="mb-5 text-sm text-muted-foreground">Según la matriz de facturación semanal.</p>
+          <BarrasHorizontales
+            titulo="Ingresos de la semana por categoría"
+            datos={CATEGORIAS_MATRIZ.map((c, i) => ({ etiqueta: CATEGORIA_LABEL[c], valor: semanal.totalesFila[i] ?? 0 }))}
+            formato={formatearMoneda}
+            destacarMayor
+          />
+        </Card>
+        <Card className="animate-fade-up p-5" style={escalonado(5)}>
+          <h3 className="text-base font-semibold">Contratos por estado</h3>
+          <p className="mb-5 text-sm text-muted-foreground">Todos los contratos registrados en la plataforma.</p>
+          <BarrasHorizontales
+            titulo="Contratos por estado"
+            datos={ESTADOS_CONTRATO.map((estado) => ({ etiqueta: estado, valor: data.contratos.filter((c) => c.estado === estado).length }))}
+            formato={(n) => pluralizar(n, "contrato", "contratos")}
+            ordenar={false}
+          />
+        </Card>
+      </div>
+
+      <MapaCobertura />
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-5">
+        <Card className="animate-fade-up overflow-hidden lg:col-span-3" style={escalonado(6)}>
+          <CardHeader titulo="Contratos recientes" />
+          <Table>
+            <thead>
+              <tr>
+                <Th>Contrato</Th>
+                <Th>Servicio</Th>
+                <Th className="hidden 2xl:table-cell">Fecha</Th>
+                <Th>Estado</Th>
+                <Th numerico>Total</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.contratos.slice(0, ULTIMOS_CONTRATOS).map((c) => (
+                <tr key={c.id}>
+                  <Td className="font-mono text-xs">{c.id}</Td>
+                  <Td>
+                    <span className="block text-foreground">{c.servicio_nombre}</span>
+                    <span className="text-xs text-muted-foreground">{c.cliente_nombre}</span>
+                  </Td>
+                  <Td className="hidden 2xl:table-cell">{formatearFecha(c.fecha)}</Td>
+                  <Td>
+                    <EstadoContratoBadge estado={c.estado} />
+                  </Td>
+                  <Td numerico>{formatearMoneda(c.total)}</Td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Card>
+
+        <Card className="animate-fade-up overflow-hidden lg:col-span-2" style={escalonado(7)}>
+          <CardHeader titulo="Mejor calificados" />
+          <ul className="divide-y divide-border/70">
+            {mejorCalificados.map((s, i) => (
+              <li key={s.codigo} className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/40">
+                <span className="w-4 text-xs font-semibold tabular-nums text-muted-foreground">{i + 1}</span>
+                <Avatar texto={iniciales(s.prestador_nombre)} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">{s.prestador_nombre}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {CATEGORIA_LABEL[s.categoria]} · {CIUDAD_LABEL[s.ciudad]}
+                  </p>
+                </div>
+                <p className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-400/10 px-2 py-0.5 text-sm tabular-nums">
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
+                  <span className="font-semibold text-foreground">{formatearCalificacion(s.calificacion)}</span>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      </div>
+    </>
+  );
+}
+
+/** Dónde están los profesionales de cada ciudad y hasta dónde atienden. */
+function MapaCobertura() {
+  const { data } = useAppStore();
+  const [ciudad, setCiudad] = useState<CiudadCobertura>("Cucuta");
+  const servicios = data.servicios.filter((s) => s.ciudad === ciudad);
+  const conServicios = CIUDADES_COBERTURA.filter((c) => data.servicios.some((s) => s.ciudad === c));
+
+  return (
+    <Card className="mt-6 animate-fade-up p-5" style={escalonado(6)}>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h3 className="text-base font-semibold">Mapa de cobertura</h3>
+          <p className="text-sm text-muted-foreground">
+            {pluralizar(servicios.length, "servicio", "servicios")} en {CIUDAD_LABEL[ciudad]}. Cada círculo es el radio de atención del profesional.
+          </p>
+        </div>
+        <Select aria-label="Ciudad del mapa" className="sm:w-48" value={ciudad} onChange={(e) => setCiudad(e.target.value as CiudadCobertura)}>
+          {CIUDADES_COBERTURA.map((c) => (
+            <option key={c} value={c}>
+              {CIUDAD_LABEL[c]}
+              {conServicios.includes(c) ? "" : " (sin servicios)"}
+            </option>
+          ))}
+        </Select>
+      </div>
+      <Mapa
+        etiqueta={`Mapa de cobertura de los profesionales en ${CIUDAD_LABEL[ciudad]}`}
+        centro={CENTRO_CIUDAD[ciudad]}
+        zoom={12}
+        alto={340}
+        circulos={servicios.map((s) => ({ id: s.codigo, centro: s.ubicacion, radioKm: s.radio_km }))}
+        marcadores={servicios.map((s) => ({
+          id: s.codigo,
+          coordenadas: s.ubicacion,
+          tipo: s.disponible ? "profesional" : "inactivo",
+          etiqueta: `${s.prestador_nombre} · ${CATEGORIA_LABEL[s.categoria]} · ${s.zona} (${s.radio_km} km)`,
+          texto: iniciales(s.prestador_nombre),
+        }))}
+      />
+    </Card>
+  );
+}

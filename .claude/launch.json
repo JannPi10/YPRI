@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "ypri-web", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "web", "run", "dev"], "port": 3000 },
+    { "name": "ypri-web-preview", "runtimeExecutable": "cmd", "runtimeArgs": ["/c", "set NEXT_DIST_DIR=.next-preview&& npm --prefix web run dev -- -p 3100"], "port": 3100 }
+  ]
+}

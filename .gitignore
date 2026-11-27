@@ -46,6 +46,7 @@ desktop.ini
 # Node / Next.js
 node_modules/
 .next/
+.next-*/
 out/
 npm-debug.log*
 yarn-debug.log*
@@ -54,3 +55,9 @@ yarn-error.log*
 # Microsoft Office temporary lock files
 ~$*
 *.tmp
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Carpeta de trabajo local (documentos/guías, 1.6 GB, repo git propio) - no versionar
+/ypri/
