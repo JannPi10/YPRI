@@ -18,9 +18,14 @@ DOCUMENTACION DE TEMAS POR SEMANAS:
   consulta, modificacion y operaciones matematicas sobre matrices bidimensionales (Guia 9).
 - [SEMANA 10 - SUBALGORITMOS EN PYTHON]: Modularizacion con funciones puras con return,
   procedimientos de presentacion, funciones lambda y paso de argumentos (Guia 10).
+- [SEMANA 11 - ARCHIVOS, EXCEL Y POO]: los datos se cargan desde 'datos/ypri_datos.json'
+  al iniciar y se guardan al cerrar sesion y al salir (modules/persistencia.py); los
+  menus de prestador y administrador abren el submenu de Excel (modules/reportes_excel.py)
+  y la opcion de eliminar servicios (.remove()). Las clases estan en la carpeta models/.
 ========================================================================================
 """
 
+import atexit
 import sys
 import os
 
@@ -32,12 +37,15 @@ from core.validaciones import (
     pedir_sn,
 )
 from data.database import get_sesion_actual
-from modules.auth import login, cerrar_sesion, registrar_usuario
+from modules.auth import login, cerrar_sesion as cerrar_sesion_base, registrar_usuario
+from modules.persistencia import cargar_datos, guardar_datos, registrar_evento, RUTA_DATOS
+from modules.reportes_excel import menu_archivos_excel
 from modules.servicios import (
     listar_servicios,
     ver_detalle_servicio,
     publicar_servicio,
     modificar_servicio,
+    eliminar_servicio,
     menu_catalogo_avanzado,
 )
 from modules.contratos import (
@@ -51,10 +59,7 @@ from modules.admin import (
     ver_estadisticas,
     ver_reporte_matricial_admin,
 )
-from modules.matrices import (
-    menu_matrices_interactivo,
-    ejecutar_ejercicio_practico_guia9,
-)
+from modules.matrices import menu_matrices_interactivo
 from modules.subalgoritmos import (
     menu_subalgoritmos_interactivo,
     mostrar_tarjeta_rendimiento_prestador,
@@ -62,6 +67,15 @@ from modules.subalgoritmos import (
 )
 
 from modules.geolocalizacion import menu_geolocalizacion_interactivo
+
+
+def cerrar_sesion():
+    """Cierra la sesion y guarda los datos en archivo (Guia 11)."""
+    usuario = get_sesion_actual()
+    if usuario:
+        registrar_evento(f"Cierre de sesion: {usuario['correo']}")
+    guardar_datos()
+    cerrar_sesion_base()
 
 def menu_cliente():
     """Menu interactivo del ciclo while para usuarios con rol 'cliente'."""
@@ -127,10 +141,12 @@ def menu_prestador():
         print("  5. Actualizar estado de contrato")
         print("  6. Explorar Matrices de Facturacion (Guia 9)")
         print("  7. Tarjeta de Rendimiento Operativo y Comisiones (Guia 10)")
+        print("  8. Eliminar un servicio propio")
+        print("  9. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)")
         print("  0. Cerrar sesion")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-7): ").strip()
+        opcion = input("  Seleccione una opcion (0-9): ").strip()
 
         if opcion == "1":
             listar_servicios(filtro_ciudad=usuario["ciudad"])
@@ -148,11 +164,16 @@ def menu_prestador():
             from data.database import contratos, calificaciones
             metricas = calcular_metricas_prestador(usuario["id"], contratos, calificaciones)
             mostrar_tarjeta_rendimiento_prestador(usuario["nombre"], metricas)
+        elif opcion == "8":
+            eliminar_servicio()
+        elif opcion == "9":
+            menu_archivos_excel()
+            continue
         elif opcion == "0":
             cerrar_sesion()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 7.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 9.")
 
         input("\n  Presione Enter para continuar...")
         print()
@@ -176,10 +197,12 @@ def menu_admin():
         print("  7. Auditoria visual de matrices completas (Admin)")
         print("  8. Modificar informacion de un servicio")
         print("  9. Modulo de Subalgoritmos y Metricas Modulares (Guia 10)")
+        print(" 10. Eliminar un servicio del catalogo")
+        print(" 11. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)")
         print("  0. Cerrar sesion")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-9): ").strip()
+        opcion = input("  Seleccione una opcion (0-11): ").strip()
 
         if opcion == "1":
             listar_usuarios()
@@ -199,11 +222,16 @@ def menu_admin():
             modificar_servicio()
         elif opcion == "9":
             menu_subalgoritmos_interactivo()
+        elif opcion == "10":
+            eliminar_servicio()
+        elif opcion == "11":
+            menu_archivos_excel()
+            continue
         elif opcion == "0":
             cerrar_sesion()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 9.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 11.")
 
         input("\n  Presione Enter para continuar...")
         print()
@@ -214,6 +242,21 @@ def main():
     Punto de entrada principal.
     Permite operar en modo consola o abrir la interfaz grafica moderna (GUI).
     """
+    # Consola en UTF-8 para que tildes y simbolos se vean bien en Windows
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except (AttributeError, ValueError):
+        pass
+
+    # GUIA 11 - ACTIVIDAD 1: recuperar la informacion guardada en la ejecucion anterior
+    estado = cargar_datos()
+    if estado == "cargado":
+        print(f"[i] Datos recuperados desde {os.path.relpath(RUTA_DATOS)}")
+    elif estado == "nuevo":
+        print(f"[i] Primera ejecucion: se creo el archivo {os.path.relpath(RUTA_DATOS)}")
+    # Respaldo final aunque el programa se cierre con Ctrl+C
+    atexit.register(guardar_datos)
+
     if len(sys.argv) > 1 and ("--gui" in sys.argv or "-g" in sys.argv):
         from app_gui import main_gui
         main_gui()
@@ -224,15 +267,13 @@ def main():
         print()
         print("  1. Iniciar sesion (Modo Consola)")
         print("  2. Registrarse como nuevo usuario")
-        print("  3. Modulo de Matrices en Python — Guia 9 (Directo)")
-        print("  4. Ejecutar Ejercicio Practico Guiado Guia 9 (3x3)")
-        print("  5. Subalgoritmos en Python — Guia 10 (Funciones, Procedimientos, Lambdas)")
-        print("  6. Ejecutar Ejercicio Practico Guiado Guia 10 (Inventario)")
-        print("  7. Abrir Interfaz Grafica de Escritorio (Tkinter)")
+        print("  3. Matrices de facturacion y demanda de YPRI (Guia 9)")
+        print("  4. Subalgoritmos y cotizador de YPRI (Guia 10)")
+        print("  5. Abrir Interfaz Grafica de Escritorio (Tkinter)")
         print("  0. Salir")
         separador()
 
-        opcion = input("  Seleccione una opcion (0-7): ").strip()
+        opcion = input("  Seleccione una opcion (0-5): ").strip()
 
         if opcion == "1":
             if login():
@@ -249,25 +290,20 @@ def main():
         elif opcion == "3":
             menu_matrices_interactivo()
         elif opcion == "4":
-            ejecutar_ejercicio_practico_guia9(interactivo=False)
-            input("\n  Presione Enter para continuar...")
-        elif opcion == "5":
             menu_subalgoritmos_interactivo()
-        elif opcion == "6":
-            from ejercicio_practico_guia10 import iniciar_programa as iniciar_inventario_g10
-            iniciar_inventario_g10()
-            input("\n  Presione Enter para continuar...")
-        elif opcion == "7":
+        elif opcion == "5":
             print("\n  [i] Iniciando interfaz grafica de escritorio de YPRI...")
             from app_gui import main_gui
             main_gui()
         elif opcion == "0":
+            if guardar_datos():
+                print(f"\n  [OK] Datos guardados en {os.path.relpath(RUTA_DATOS)}")
             print("\n  Gracias por utilizar YPRI.")
             print("  Conectando hogares con profesionales de confianza.")
             print()
             break
         else:
-            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 7.")
+            print("\n[!] Opcion invalida. Ingrese un numero entre 0 y 5.")
 
         print()
 

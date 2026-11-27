@@ -1,0 +1,8 @@
+# Dependencias del aplicativo YPRI en Python (Diseño Funcional)
+# Instalar con:  pip install -r requirements.txt
+#
+# Bibliotecas estandar de Python que tambien se usan y NO requieren instalacion:
+# tkinter (interfaz grafica), json, os, datetime, math, unicodedata, unittest, atexit.
+
+# Lectura y escritura de archivos Excel (.xlsx) - Guia 11
+openpyxl>=3.1

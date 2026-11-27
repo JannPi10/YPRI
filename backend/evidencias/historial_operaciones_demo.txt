@@ -1,0 +1,8 @@
+27/11/2026 18:39:24 | Inicio de sesion: USR-003 | Admin YPRI | admin | admin@ypri.com
+27/11/2026 18:39:24 | Reporte Excel exportado: reporte_ypri.xlsx
+27/11/2026 18:39:24 | Importados desde Excel: SERV-20, SERV-21, SERV-22
+27/11/2026 18:39:24 | Servicio eliminado: SERV-22
+27/11/2026 18:39:24 | Cierre de sesion: admin@ypri.com
+27/11/2026 18:39:25 | Inicio de sesion: USR-002 | Carlos Gomez | prestador | carlos.gomez@email.com
+27/11/2026 18:39:25 | Servicio publicado: SERV-09 (Electricidad)
+27/11/2026 18:39:25 | Cierre de sesion: carlos.gomez@email.com

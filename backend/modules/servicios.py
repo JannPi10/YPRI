@@ -22,6 +22,12 @@ DOCUMENTACION DE TEMAS POR SEMANAS:
   * Actividad 13: Reto de integracion (minimo, maximo, promedio y ranking Top 3).
 - [SEMANA 9 - MATRICES EN PYTHON]:
   * Los servicios y sus categorias constituyen las filas analiticas de las matrices de YPRI.
+- [GUIA 11 - ARCHIVOS Y PROGRAMACION ORIENTADA A OBJETOS]:
+  * publicar_servicio() crea un objeto Servicio; sus setters validan los datos y luego
+    se guarda en el vector con a_diccionario().
+  * modificar_servicio() cambia la tarifa con el setter tarifa_hora (validacion en la clase).
+  * eliminar_servicio() quita el registro del vector con .remove().
+  * Cada cambio se guarda en archivo (guardar_datos) y en el historial (registrar_evento).
 ========================================================================================
 """
 
@@ -37,8 +43,10 @@ from core.validaciones import (
     pedir_id_registro,
     generar_id,
 )
-from data.database import servicios, get_sesion_actual
+from data.database import servicios, contratos, get_sesion_actual
+from models.servicio import Servicio
 from modules.geolocalizacion import CENTRO_CIUDAD, RADIO_COBERTURA_KM
+from modules.persistencia import guardar_datos, registrar_evento
 
 
 # ========================================================================================
@@ -379,12 +387,7 @@ def publicar_servicio():
         print("[!] Solo los prestadores o administradores pueden publicar servicios.")
         return
 
-    nuevo_codigo = generar_id("SERV", servicios)
-
-    # Validacion para evitar codigos duplicados
-    for s in servicios:
-        if s["codigo"] == nuevo_codigo:
-            nuevo_codigo = f"SERV-{len(servicios)+10}"
+    nuevo_codigo = generar_codigo_servicio_libre()
 
     categoria = pedir_categoria()
     descripcion = pedir_texto_minimo("  Descripcion del servicio: ", "descripcion", minimo=10)
@@ -392,29 +395,46 @@ def publicar_servicio():
     ciudad = pedir_ciudad()
     disp_resp = pedir_sn("  ¿Disponibilidad inmediata? (s/n): ")
 
-    # Creacion del registro como DICCIONARIO dentro del vector
-    nuevo_servicio = {
-        "codigo": nuevo_codigo,
-        "prestador_id": usuario_actual["id"],
-        "prestador_nombre": usuario_actual["nombre"],
-        "categoria": categoria,
-        "descripcion": descripcion.strip(),
-        "tarifa_hora": tarifa,
-        "ciudad": ciudad,
-        # Geolocalizacion: el servicio nuevo parte del centro de su ciudad.
-        "zona": "Centro",
-        "lat": CENTRO_CIUDAD.get(ciudad, CENTRO_CIUDAD["Cucuta"])[0],
-        "lng": CENTRO_CIUDAD.get(ciudad, CENTRO_CIUDAD["Cucuta"])[1],
-        "radio_km": RADIO_COBERTURA_KM,
-        "disponible": (disp_resp == "s"),
-        "calificacion": 5.0,
-        "num_contratos": 0
-    }
+    # GUIA 11 - ACTIVIDAD 3: creacion de un OBJETO de la clase Servicio.
+    # Los setters de la clase vuelven a validar categoria, descripcion, tarifa y ciudad.
+    try:
+        objeto_servicio = Servicio(
+            codigo=nuevo_codigo,
+            prestador_id=usuario_actual["id"],
+            prestador_nombre=usuario_actual["nombre"],
+            categoria=categoria,
+            descripcion=descripcion,
+            tarifa_hora=tarifa,
+            ciudad=ciudad,
+            # Geolocalizacion: el servicio nuevo parte del centro de su ciudad.
+            zona="Centro",
+            lat=CENTRO_CIUDAD.get(ciudad, CENTRO_CIUDAD["Cucuta"])[0],
+            lng=CENTRO_CIUDAD.get(ciudad, CENTRO_CIUDAD["Cucuta"])[1],
+            radio_km=RADIO_COBERTURA_KM,
+            disponible=(disp_resp == "s"),
+        )
+    except ValueError as error:
+        print(f"[!] No se pudo publicar el servicio: {error}")
+        return
 
-    # GUIA 8 - ACTIVIDAD 1.2: .append() sobre vector
-    servicios.append(nuevo_servicio)
-    print(f"\n[OK] Servicio '{nuevo_codigo}' publicado exitosamente.")
+    # GUIA 8 - ACTIVIDAD 1.2: .append() sobre vector (el objeto se guarda como diccionario)
+    servicios.append(objeto_servicio.a_diccionario())
+    guardar_datos()
+    registrar_evento(f"Servicio publicado: {objeto_servicio.codigo} ({objeto_servicio.categoria})")
+    print(f"\n[OK] Servicio publicado exitosamente:")
+    print(f"     {objeto_servicio}")  # __str__ sobrescrito en la clase Servicio
     print(f"     Total de servicios en el vector YPRI: {len(servicios)}")
+
+
+def generar_codigo_servicio_libre():
+    """Funcion con return: genera un codigo SERV-NN que todavia no exista en el vector."""
+    codigos_usados = [s["codigo"] for s in servicios]
+    numero = len(servicios) + 1
+    codigo = f"SERV-{numero:02d}"
+    while codigo in codigos_usados:
+        numero += 1
+        codigo = f"SERV-{numero:02d}"
+    return codigo
 
 
 def modificar_servicio():
@@ -463,19 +483,19 @@ def modificar_servicio():
         else:
             servicio_encontrado["descripcion"] = nueva_desc
 
+    # GUIA 11 - ACTIVIDAD 4: la tarifa se cambia con el SETTER de la clase Servicio,
+    # que convierte el texto a float y rechaza valores fuera de rango.
+    objeto_servicio = Servicio.desde_diccionario(servicio_encontrado)
     while True:
-        nueva_tarifa = input(f"  Tarifa/hora [${servicio_encontrado['tarifa_hora']:,.0f}] (Enter para conservar): ").strip()
+        nueva_tarifa = input(f"  Tarifa/hora [${objeto_servicio.tarifa_hora:,.0f}] (Enter para conservar): ").strip()
         if nueva_tarifa == "":
             break
         try:
-            t = float(nueva_tarifa)
-            if 10000 <= t <= 500000:
-                servicio_encontrado["tarifa_hora"] = t
-                break
-            else:
-                print("[!] La tarifa debe estar entre $10.000 y $500.000 COP. Intente de nuevo.")
-        except ValueError:
-            print("[!] Valor invalido. Ingrese solo numeros (ej. 35000) o Enter para conservar.")
+            objeto_servicio.tarifa_hora = nueva_tarifa
+            servicio_encontrado["tarifa_hora"] = objeto_servicio.tarifa_hora
+            break
+        except ValueError as error:
+            print(f"[!] {error} Intente de nuevo o presione Enter para conservar.")
 
     while True:
         resp_disp = input(f"  ¿Disponible? (s/n) [{'s' if servicio_encontrado['disponible'] else 'n'}]: ").strip().lower()
@@ -486,7 +506,71 @@ def modificar_servicio():
             break
         print("[!] Ingrese 's' para Si, 'n' para No, o Enter para conservar.")
 
+    guardar_datos()
+    registrar_evento(f"Servicio modificado: {codigo}")
     print(f"\n[OK] Servicio '{codigo}' actualizado exitosamente.")
     print(f"     Descripcion: {servicio_encontrado['descripcion']}")
     print(f"     Tarifa:      ${servicio_encontrado['tarifa_hora']:,.0f} COP/h")
     print(f"     Disponible:  {'Si' if servicio_encontrado['disponible'] else 'No'}")
+
+
+def quitar_servicio_del_catalogo(codigo, usuario_actual, coleccion=None):
+    """
+    Funcion con return: elimina un servicio del vector con .remove().
+    Retorna una tupla (exito, mensaje). No permite borrar servicios con contratos
+    activos ni servicios de otro prestador (salvo el administrador).
+    """
+    coleccion = servicios if coleccion is None else coleccion
+    servicio_encontrado = None
+    for serv in coleccion:
+        if serv["codigo"] == codigo:
+            servicio_encontrado = serv
+            break
+
+    if servicio_encontrado is None:
+        return False, f"No se encontro el servicio '{codigo}'."
+    if usuario_actual["rol"] != "admin" and servicio_encontrado["prestador_id"] != usuario_actual["id"]:
+        return False, "Solo puede eliminar los servicios publicados por usted."
+    activos = [c for c in contratos
+               if c["servicio_codigo"] == codigo and c["estado"] in ("Pendiente", "En proceso")]
+    if len(activos) > 0:
+        return False, f"El servicio tiene {len(activos)} contrato(s) activo(s); finalicelos antes de eliminarlo."
+
+    # Operacion .remove() sobre la lista (vector) de servicios
+    coleccion.remove(servicio_encontrado)
+    return True, f"Servicio '{codigo}' eliminado. Quedan {len(coleccion)} servicios en el catalogo."
+
+
+def eliminar_servicio():
+    """
+    Procedimiento del menu: pide el codigo, confirma y elimina el servicio.
+    Completa el ciclo agregar (append) - consultar - modificar - eliminar (remove).
+    """
+    mostrar_encabezado("ELIMINAR SERVICIO")
+    print()
+
+    usuario_actual = get_sesion_actual()
+    if not usuario_actual or usuario_actual["rol"] not in ("prestador", "admin"):
+        print("[!] Solo los prestadores o administradores pueden eliminar servicios.")
+        return
+    if len(servicios) == 0:
+        print("[i] El catalogo esta vacio: no hay servicios para eliminar.")
+        return
+
+    codigo = pedir_id_registro(
+        "  Codigo del servicio a eliminar (o '0' para cancelar): ",
+        prefijo_esperado="SERV"
+    )
+    if codigo is None:
+        return
+    if pedir_sn(f"  ¿Seguro que desea eliminar '{codigo}'? (s/n): ") == "n":
+        print("[i] Eliminacion cancelada.")
+        return
+
+    exito, mensaje = quitar_servicio_del_catalogo(codigo, usuario_actual)
+    if exito:
+        guardar_datos()
+        registrar_evento(f"Servicio eliminado: {codigo}")
+        print(f"\n[OK] {mensaje}")
+    else:
+        print(f"[!] {mensaje}")

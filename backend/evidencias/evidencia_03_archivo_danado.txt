@@ -1,0 +1,21 @@
+[!] El archivo de datos esta danado (JSONDecodeError).
+    Se guardo una copia en 'ypri_datos.json.danado' y se usan los datos iniciales.
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              BIENVENIDO A YPRI
+========================================================================
+
+  1. Iniciar sesion (Modo Consola)
+  2. Registrarse como nuevo usuario
+  3. Matrices de facturacion y demanda de YPRI (Guia 9)
+  4. Subalgoritmos y cotizador de YPRI (Guia 10)
+  5. Abrir Interfaz Grafica de Escritorio (Tkinter)
+  0. Salir
+------------------------------------------------------------------------
+  Seleccione una opcion (0-5): 0
+
+  [OK] Datos guardados en datos\ypri_datos.json
+
+  Gracias por utilizar YPRI.
+  Conectando hogares con profesionales de confianza.
+

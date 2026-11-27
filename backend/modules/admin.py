@@ -14,6 +14,9 @@ DOCUMENTACION DE TEMAS POR SEMANAS:
 - [SEMANA 9 - MATRICES EN PYTHON]:
   * Integracion del modulo de matrices en las metricas operativas y financieras del admin.
   * Reporte ejecutivo que articula el total general y categoria lider desde la matriz.
+- [GUIA 11 - SOBRESCRITURA DE OPERADORES]:
+  * ver_estadisticas() crea una Factura por contrato y las suma con el operador +
+    sobrescrito (__add__ / __radd__) para obtener la facturacion consolidada.
 ========================================================================================
 """
 
@@ -34,6 +37,7 @@ from data.database import (
     matriz_ventas_ciudades,
     get_sesion_actual,
 )
+from models.factura import Factura
 from modules.matrices import (
     calcular_total_general,
     calcular_promedio_general,
@@ -107,6 +111,10 @@ def ver_estadisticas():
     print(f"    Completados:       {contratos_completados}")
     print(f"    Pendientes:        {contratos_pendientes}")
     print(f"    Ingresos contratos:${ingresos_contratos:>12,.2f} COP")
+    # GUIA 11: suma de objetos Factura con el operador + sobrescrito
+    facturas = [Factura.desde_contrato(c) for c in contratos]
+    consolidada = sum(facturas, Factura.vacia())
+    print(f"    Facturacion POO:   {consolidada}")
     print()
     print(f"  MATRICES ANALITICAS (Guia 9 — Matriz Ventas Semanales 5x6)")
     print(f"    Facturacion total: ${total_matriz_semanal:>12,.2f} COP")
