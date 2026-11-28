@@ -1,0 +1,97 @@
+==============================================================================
+  YPRI - RESULTADO DE LAS PRUEBAS AUTOMATIZADAS
+  Fecha de ejecucion: 27/11/2026 18:58:21
+  Python 3.12.10
+==============================================================================
+
+### tests_guia10.py
+test_01_ejercicio_practico_seccion2 (tests_guia10.TestGuia10Subalgoritmos.test_01_ejercicio_practico_seccion2)
+Verifica las funciones del Sistema de Inventario de la Sección 2. ... ok
+test_02_funciones_con_return_liquidacion (tests_guia10.TestGuia10Subalgoritmos.test_02_funciones_con_return_liquidacion)
+Verifica la función calcular_liquidacion_contrato. ... ok
+test_03_funciones_con_return_comision (tests_guia10.TestGuia10Subalgoritmos.test_03_funciones_con_return_comision)
+Verifica la función calcular_comision_plataforma. ... ok
+test_04_funciones_con_return_promedio_rating (tests_guia10.TestGuia10Subalgoritmos.test_04_funciones_con_return_promedio_rating)
+Verifica el recálculo ponderado del rating promedio. ... ok
+test_05_funciones_con_return_estadisticas_vector (tests_guia10.TestGuia10Subalgoritmos.test_05_funciones_con_return_estadisticas_vector)
+Verifica la función calcular_resumen_estadistico. ... ok
+test_06_procedimientos_interaccion (tests_guia10.TestGuia10Subalgoritmos.test_06_procedimientos_interaccion)
+Verifica que los procedimientos se ejecuten correctamente sin retornar valores. ... ok
+test_07_funciones_lambda (tests_guia10.TestGuia10Subalgoritmos.test_07_funciones_lambda)
+Verifica el uso de expresiones lambda para cálculos y ordenamientos. ... ok
+test_08_paso_argumentos_inmutables_vs_mutables (tests_guia10.TestGuia10Subalgoritmos.test_08_paso_argumentos_inmutables_vs_mutables)
+Demuestra rigurosamente la diferencia entre mutables e inmutables. ... ok
+test_09_modularizacion_y_conservacion_de_funcionalidad (tests_guia10.TestGuia10Subalgoritmos.test_09_modularizacion_y_conservacion_de_funcionalidad)
+Comprueba que todos los módulos cooperen sin dependencias circulares. ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.023s
+
+OK
+
+### tests_geolocalizacion.py
+test_filtros (tests_geolocalizacion.TestCercania.test_filtros) ... ok
+test_mas_cercano (tests_geolocalizacion.TestCercania.test_mas_cercano) ... ok
+test_ordenados_por_distancia (tests_geolocalizacion.TestCercania.test_ordenados_por_distancia) ... ok
+test_procedimiento_imprime_tabla (tests_geolocalizacion.TestCercania.test_procedimiento_imprime_tabla) ... ok
+test_radio_de_cobertura (tests_geolocalizacion.TestCercania.test_radio_de_cobertura) ... ok
+test_distancia_cero_y_simetrica (tests_geolocalizacion.TestFormulas.test_distancia_cero_y_simetrica) ... ok
+test_distancias_conocidas (tests_geolocalizacion.TestFormulas.test_distancias_conocidas) ... ok
+test_interpolar_y_formato (tests_geolocalizacion.TestFormulas.test_interpolar_y_formato) ... ok
+test_tiempo_llegada (tests_geolocalizacion.TestFormulas.test_tiempo_llegada) ... ok
+test_recorrido_simulado (tests_geolocalizacion.TestSeguimiento.test_recorrido_simulado) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.001s
+
+OK
+
+### tests_pedido_rapido.py
+test_matrices_siguen_con_cinco_filas (tests_pedido_rapido.TestBelleza.test_matrices_siguen_con_cinco_filas) ... ok
+test_no_confunde (tests_pedido_rapido.TestBelleza.test_no_confunde) ... ok
+test_profesional_de_belleza_cercana (tests_pedido_rapido.TestBelleza.test_profesional_de_belleza_cercana) ... ok
+test_reconoce_belleza (tests_pedido_rapido.TestBelleza.test_reconoce_belleza) ... ok
+test_errores_de_escritura (tests_pedido_rapido.TestPalabrasClave.test_errores_de_escritura) ... ok
+test_frase_exacta_gana (tests_pedido_rapido.TestPalabrasClave.test_frase_exacta_gana) ... ok
+test_frases_cotidianas (tests_pedido_rapido.TestPalabrasClave.test_frases_cotidianas) ... ok
+test_normalizar (tests_pedido_rapido.TestPalabrasClave.test_normalizar) ... ok
+test_sin_relacion (tests_pedido_rapido.TestPalabrasClave.test_sin_relacion) ... ok
+test_urgencia (tests_pedido_rapido.TestPalabrasClave.test_urgencia) ... ok
+test_asignacion (tests_pedido_rapido.TestPedidoInmediato.test_asignacion) ... ok
+test_barrio_mas_cercano (tests_pedido_rapido.TestPedidoInmediato.test_barrio_mas_cercano) ... ok
+test_posicion_actual (tests_pedido_rapido.TestPedidoInmediato.test_posicion_actual) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.019s
+
+OK
+
+### tests_guia11.py
+test_archivo_danado_no_detiene_el_programa (tests_guia11.TestArchivos.test_archivo_danado_no_detiene_el_programa) ... ok
+test_archivo_inexistente_crea_uno_nuevo (tests_guia11.TestArchivos.test_archivo_inexistente_crea_uno_nuevo) ... ok
+test_guardar_y_recuperar_despues_de_reiniciar (tests_guia11.TestArchivos.test_guardar_y_recuperar_despues_de_reiniciar) ... ok
+test_historial_agrega_lineas_sin_borrar (tests_guia11.TestArchivos.test_historial_agrega_lineas_sin_borrar) ... ok
+test_objeto_servicio_y_metodos (tests_guia11.TestClasesYEncapsulamiento.test_objeto_servicio_y_metodos) ... ok
+test_setters_de_usuario (tests_guia11.TestClasesYEncapsulamiento.test_setters_de_usuario) ... ok
+test_setters_rechazan_datos_incorrectos (tests_guia11.TestClasesYEncapsulamiento.test_setters_rechazan_datos_incorrectos) ... ok
+test_todos_los_datos_iniciales_son_objetos_validos (tests_guia11.TestClasesYEncapsulamiento.test_todos_los_datos_iniciales_son_objetos_validos) ... ok
+test_exportar_con_encabezados_y_totales (tests_guia11.TestExcel.test_exportar_con_encabezados_y_totales) ... ok
+test_importar_agrega_validos_y_rechaza_invalidos (tests_guia11.TestExcel.test_importar_agrega_validos_y_rechaza_invalidos) ... ok
+test_importar_archivo_inexistente_o_sin_columnas (tests_guia11.TestExcel.test_importar_archivo_inexistente_o_sin_columnas) ... ok
+test_importar_dos_veces_no_duplica (tests_guia11.TestExcel.test_importar_dos_veces_no_duplica) ... ok
+test_herencia_crea_la_clase_derivada_correcta (tests_guia11.TestHerenciaYOperadores.test_herencia_crea_la_clase_derivada_correcta) ... ok
+test_metodo_sobrescrito_y_metodo_heredado (tests_guia11.TestHerenciaYOperadores.test_metodo_sobrescrito_y_metodo_heredado) ... ok
+test_operador_igual_en_servicios_y_usuarios (tests_guia11.TestHerenciaYOperadores.test_operador_igual_en_servicios_y_usuarios) ... ok
+test_operador_suma_en_facturas (tests_guia11.TestHerenciaYOperadores.test_operador_suma_en_facturas) ... ok
+test_cliente_no_puede_eliminar_servicios_ajenos (tests_guia11.TestIntegracion.test_cliente_no_puede_eliminar_servicios_ajenos) ... ok
+test_eliminar_servicio_con_remove (tests_guia11.TestIntegracion.test_eliminar_servicio_con_remove) ... ok
+test_todos_los_modulos_importan (tests_guia11.TestIntegracion.test_todos_los_modulos_importan) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.122s
+
+OK
+
+==============================================================================
+  TOTAL: 51 pruebas | 51 correctas | 0 con fallas
+==============================================================================

@@ -17,10 +17,19 @@ DOCUMENTACION DE TEMAS POR SEMANAS:
 - [SEMANA 9 - MATRICES EN PYTHON]:
   * Segregacion de permisos: los administradores tienen acceso a la auditoria de matrices
     y los clientes/prestadores a los reportes analiticos asociados.
+- [GUIA 11 - PROGRAMACION ORIENTADA A OBJETOS]:
+  * login() convierte cada registro en un objeto (Cliente, Prestador o Administrador)
+    y usa su metodo heredado verificar_credenciales() y el procedimiento presentar(),
+    que muestra un texto distinto segun el metodo describir_rol() sobrescrito.
+  * registrar_usuario() crea el objeto con su clase; los setters validan nombre,
+    correo y telefono, y luego se guarda con a_diccionario().
+  * Cada inicio de sesion y registro queda en el historial (archivo, modo "a").
 ========================================================================================
 """
 
 from core.constantes import ROLES_SISTEMA
+from models.usuario import Usuario
+from modules.persistencia import registrar_evento, guardar_datos
 from core.validaciones import (
     mostrar_encabezado,
     pedir_correo,
@@ -53,12 +62,17 @@ def login():
         contrasena = input("  Contrasena: ").strip()
 
     # GUIA 8 - ACTIVIDAD 6: Busqueda secuencial en el vector de usuarios
-    # [YA SE CUMPLIA]: Recorre el vector elemento por elemento comparando las claves
+    # GUIA 11: cada registro se convierte en un objeto de su clase (herencia)
     for usuario in usuarios:
-        if usuario["correo"] == correo and usuario["contrasena"] == contrasena:
+        try:
+            objeto_usuario = Usuario.desde_diccionario(usuario)
+        except (ValueError, KeyError):
+            continue  # registro incompleto: se omite sin detener el login
+        if objeto_usuario.verificar_credenciales(correo, contrasena):
             set_sesion_actual(usuario)
-            print(f"\n[OK] Bienvenido/a, {usuario['nombre']}!")
-            print(f"     Rol: {usuario['rol'].capitalize()} | Ciudad: {usuario['ciudad']}")
+            # Metodo heredado que usa describir_rol() sobrescrito en cada clase derivada
+            objeto_usuario.presentar()
+            registrar_evento(f"Inicio de sesion: {objeto_usuario}")
             return True
 
     print("\n[!] Correo o contrasena incorrectos. Intente de nuevo.")
@@ -118,19 +132,27 @@ def registrar_usuario():
 
     ciudad = pedir_ciudad()
 
-    # Creacion del registro como DICCIONARIO
-    nuevo_usuario = {
-        "id": nuevo_id,
-        "nombre": nombre,
-        "correo": correo,
-        "contrasena": contrasena,
-        "rol": rol,
-        "ciudad": ciudad,
-        "telefono": telefono
-    }
+    # GUIA 11: el registro se crea como OBJETO de la clase que corresponde al rol.
+    # Los setters de la clase validan de nuevo nombre, correo y telefono.
+    try:
+        objeto_usuario = Usuario.desde_diccionario({
+            "id": nuevo_id,
+            "nombre": nombre,
+            "correo": correo,
+            "contrasena": contrasena,
+            "rol": rol,
+            "ciudad": ciudad,
+            "telefono": telefono
+        })
+    except ValueError as error:
+        print(f"[!] No se pudo registrar el usuario: {error}")
+        return
 
-    # Insercion en la coleccion en memoria
-    usuarios.append(nuevo_usuario)
+    # Insercion en la coleccion en memoria como DICCIONARIO (Guias 7 y 8)
+    usuarios.append(objeto_usuario.a_diccionario())
+    guardar_datos()
+    registrar_evento(f"Usuario registrado: {objeto_usuario}")
 
-    print(f"\n[OK] Usuario '{nombre}' registrado exitosamente con ID {nuevo_id}.")
+    print(f"\n[OK] Usuario '{objeto_usuario.nombre}' registrado exitosamente con ID {nuevo_id}.")
+    print(f"     {objeto_usuario.describir_rol()}")
     print(f"     Total de usuarios en YPRI: {len(usuarios)}")

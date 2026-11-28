@@ -1,0 +1,277 @@
+[i] Primera ejecucion: se creo el archivo datos\ypri_datos.json
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              BIENVENIDO A YPRI
+========================================================================
+
+  1. Iniciar sesion (Modo Consola)
+  2. Registrarse como nuevo usuario
+  3. Matrices de facturacion y demanda de YPRI (Guia 9)
+  4. Subalgoritmos y cotizador de YPRI (Guia 10)
+  5. Abrir Interfaz Grafica de Escritorio (Tkinter)
+  0. Salir
+------------------------------------------------------------------------
+  Seleccione una opcion (0-5): 1
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              INICIAR SESION
+========================================================================
+
+  Correo electronico: admin@ypri.com
+  Contrasena: admin2026
+
+[OK] Bienvenido/a, Admin YPRI!
+     Administrador: supervisa usuarios, servicios y reportes | Ciudad: Cucuta
+     Puede: gestionar usuarios, auditar matrices, importar y exportar Excel, respaldar datos
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              PANEL DE ADMINISTRACION — Admin YPRI
+========================================================================
+
+  1. Listar todos los usuarios del sistema
+  2. Ver catalogo general de servicios
+  3. Ver todos los contratos
+  4. Actualizar estado de contrato
+  5. Ver reporte consolidado de metricas y estadisticas
+  6. Modulo de Matrices en Python (Guia 9: Ventas, Especiales, Ejercicio)
+  7. Auditoria visual de matrices completas (Admin)
+  8. Modificar informacion de un servicio
+  9. Modulo de Subalgoritmos y Metricas Modulares (Guia 10)
+ 10. Eliminar un servicio del catalogo
+ 11. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-11): 11
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              ARCHIVOS Y REPORTES EXCEL (Guia 11)
+========================================================================
+
+  1. Exportar reporte a Excel (servicios, contratos y facturacion)
+  2. Importar servicios desde un archivo Excel
+  3. Guardar ahora los datos en archivo
+  4. Ver historial de operaciones guardado
+  0. Volver
+------------------------------------------------------------------------
+  Seleccione una opcion (0-4): 1
+[OK] Reporte exportado: C:\Users\VICTUS\AppData\Local\Temp\claude\13a56317d5085bbd\edd5a56e-176a-4035-810b-0143015f77b6\scratchpad\ev\reportes\reporte_ypri.xlsx
+     Hojas: Servicios (6), Contratos (1), Facturacion semanal
+
+  Presione Enter para continuar...
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              ARCHIVOS Y REPORTES EXCEL (Guia 11)
+========================================================================
+
+  1. Exportar reporte a Excel (servicios, contratos y facturacion)
+  2. Importar servicios desde un archivo Excel
+  3. Guardar ahora los datos en archivo
+  4. Ver historial de operaciones guardado
+  0. Volver
+------------------------------------------------------------------------
+  Seleccione una opcion (0-4): 2
+  Archivo de ejemplo: C:\Users\VICTUS\AppData\Local\Temp\claude\13a56317d5085bbd\edd5a56e-176a-4035-810b-0143015f77b6\scratchpad\ev\datos\plantilla_servicios.xlsx
+  Ruta del Excel a importar (Enter para usar el de ejemplo): 
+
+[OK] Servicios importados al catalogo: 3
+     + SERV-20
+     + SERV-21
+     + SERV-22
+[!] Filas rechazadas: 1
+     Fila 5: La tarifa debe estar entre $10,000 y $500,000 COP.
+     Ya aparecen en el catalogo, la busqueda y el ordenamiento de servicios.
+
+  Presione Enter para continuar...
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              ARCHIVOS Y REPORTES EXCEL (Guia 11)
+========================================================================
+
+  1. Exportar reporte a Excel (servicios, contratos y facturacion)
+  2. Importar servicios desde un archivo Excel
+  3. Guardar ahora los datos en archivo
+  4. Ver historial de operaciones guardado
+  0. Volver
+------------------------------------------------------------------------
+  Seleccione una opcion (0-4): 4
+  Ultimas 3 operaciones (historial_operaciones.txt):
+   27/11/2026 18:39:24 | Inicio de sesion: USR-003 | Admin YPRI | admin | admin@ypri.com
+   27/11/2026 18:39:24 | Reporte Excel exportado: reporte_ypri.xlsx
+   27/11/2026 18:39:24 | Importados desde Excel: SERV-20, SERV-21, SERV-22
+
+  Presione Enter para continuar...
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              ARCHIVOS Y REPORTES EXCEL (Guia 11)
+========================================================================
+
+  1. Exportar reporte a Excel (servicios, contratos y facturacion)
+  2. Importar servicios desde un archivo Excel
+  3. Guardar ahora los datos en archivo
+  4. Ver historial de operaciones guardado
+  0. Volver
+------------------------------------------------------------------------
+  Seleccione una opcion (0-4): 0
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              PANEL DE ADMINISTRACION — Admin YPRI
+========================================================================
+
+  1. Listar todos los usuarios del sistema
+  2. Ver catalogo general de servicios
+  3. Ver todos los contratos
+  4. Actualizar estado de contrato
+  5. Ver reporte consolidado de metricas y estadisticas
+  6. Modulo de Matrices en Python (Guia 9: Ventas, Especiales, Ejercicio)
+  7. Auditoria visual de matrices completas (Admin)
+  8. Modificar informacion de un servicio
+  9. Modulo de Subalgoritmos y Metricas Modulares (Guia 10)
+ 10. Eliminar un servicio del catalogo
+ 11. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-11): 2
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              CATALOGO DE SERVICIOS YPRI
+========================================================================
+
+
+No. Codigo    Prestador           Categoria           Tarifa/h  Disp.  Rating
+------------------------------------------------------------------------
+1   SERV-01   Carlos Gomez        Electricidad    $    35,000  Si     4.8*
+2   SERV-02   Marta Rodriguez     Plomeria        $    30,000  Si     4.5*
+3   SERV-03   Andres Silva        Climatizacion   $    45,000  No     5.0*
+4   SERV-04   Jorge Mendoza       Cerrajeria      $    38,000  Si     4.7*
+5   SERV-05   Sandra Rios         Limpieza        $    25,000  Si     4.3*
+6   SERV-07   Valentina Ruiz      Belleza         $    30,000  Si     4.9*
+7   SERV-20   Luis Ortega         Electricidad    $    40,000  Si     4.6*
+8   SERV-21   Diana Paez          Plomeria        $    32,000  Si     4.4*
+9   SERV-22   Rosa Medina         Limpieza        $    27,000  No     4.8*
+------------------------------------------------------------------------
+Servicios mostrados: 9 de 9 en la vista actual.
+
+  Presione Enter para continuar...
+
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              PANEL DE ADMINISTRACION — Admin YPRI
+========================================================================
+
+  1. Listar todos los usuarios del sistema
+  2. Ver catalogo general de servicios
+  3. Ver todos los contratos
+  4. Actualizar estado de contrato
+  5. Ver reporte consolidado de metricas y estadisticas
+  6. Modulo de Matrices en Python (Guia 9: Ventas, Especiales, Ejercicio)
+  7. Auditoria visual de matrices completas (Admin)
+  8. Modificar informacion de un servicio
+  9. Modulo de Subalgoritmos y Metricas Modulares (Guia 10)
+ 10. Eliminar un servicio del catalogo
+ 11. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-11): 10
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              ELIMINAR SERVICIO
+========================================================================
+
+  Codigo del servicio a eliminar (o '0' para cancelar): SERV-22
+  ¿Seguro que desea eliminar 'SERV-22'? (s/n): s
+
+[OK] Servicio 'SERV-22' eliminado. Quedan 8 servicios en el catalogo.
+
+  Presione Enter para continuar...
+
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              PANEL DE ADMINISTRACION — Admin YPRI
+========================================================================
+
+  1. Listar todos los usuarios del sistema
+  2. Ver catalogo general de servicios
+  3. Ver todos los contratos
+  4. Actualizar estado de contrato
+  5. Ver reporte consolidado de metricas y estadisticas
+  6. Modulo de Matrices en Python (Guia 9: Ventas, Especiales, Ejercicio)
+  7. Auditoria visual de matrices completas (Admin)
+  8. Modificar informacion de un servicio
+  9. Modulo de Subalgoritmos y Metricas Modulares (Guia 10)
+ 10. Eliminar un servicio del catalogo
+ 11. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-11): 5
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              ESTADISTICAS DEL SISTEMA
+========================================================================
+
+  USUARIOS (Vector usuarios[])
+    Total registrados: 3
+    Clientes:          1
+    Prestadores:       1
+
+  SERVICIOS (Vector servicios[])
+    Total publicados:  8
+    Con disp. activa:  7
+
+  CONTRATOS (Vector contratos[])
+    Total acuerdos:    1
+    Completados:       1
+    Pendientes:        0
+    Ingresos contratos:$  208,250.00 COP
+    Facturacion POO:   Facturacion consolidada: subtotal $175,000.00 + IVA $33,250.00 = $208,250.00 COP (1 contrato(s))
+
+  MATRICES ANALITICAS (Guia 9 — Matriz Ventas Semanales 5x6)
+    Facturacion total: $11,270,000.00 COP
+    Promedio por celda:$  375,666.67 COP
+    Categoria lider:   Climatizacion ($3,200,000 COP)
+    Dia mas productivo:Viernes ($2,520,000 COP)
+    Venta individual record: $710,000 COP
+------------------------------------------------------------------------
+
+  Presione Enter para continuar...
+
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              PANEL DE ADMINISTRACION — Admin YPRI
+========================================================================
+
+  1. Listar todos los usuarios del sistema
+  2. Ver catalogo general de servicios
+  3. Ver todos los contratos
+  4. Actualizar estado de contrato
+  5. Ver reporte consolidado de metricas y estadisticas
+  6. Modulo de Matrices en Python (Guia 9: Ventas, Especiales, Ejercicio)
+  7. Auditoria visual de matrices completas (Admin)
+  8. Modificar informacion de un servicio
+  9. Modulo de Subalgoritmos y Metricas Modulares (Guia 10)
+ 10. Eliminar un servicio del catalogo
+ 11. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-11): 0
+
+[i] Sesion cerrada exitosamente.
+
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              BIENVENIDO A YPRI
+========================================================================
+
+  1. Iniciar sesion (Modo Consola)
+  2. Registrarse como nuevo usuario
+  3. Matrices de facturacion y demanda de YPRI (Guia 9)
+  4. Subalgoritmos y cotizador de YPRI (Guia 10)
+  5. Abrir Interfaz Grafica de Escritorio (Tkinter)
+  0. Salir
+------------------------------------------------------------------------
+  Seleccione una opcion (0-5): 0
+
+  [OK] Datos guardados en datos\ypri_datos.json
+
+  Gracias por utilizar YPRI.
+  Conectando hogares con profesionales de confianza.
+

@@ -8,6 +8,12 @@
 
 ---
 
+## Proyecto final de Diseño Funcional (Unidades 1, 2 y 3)
+
+- **Documentación técnica (español e inglés):** [`DOCUMENTACION_TECNICA.md`](DOCUMENTACION_TECNICA.md), también en [DOCX](docs/DOCUMENTACION_TECNICA.docx) y [PDF](docs/DOCUMENTACION_TECNICA.pdf) con formato FESC y normas APA.
+- **Guía 11:** archivos (`backend/modules/persistencia.py`), Excel (`backend/modules/reportes_excel.py`) y clases con herencia y sobrescritura (`backend/models/`).
+- **Ejecutar:** `pip install -r requirements.txt`, luego `cd backend` y `python main.py`. Pruebas: `python ejecutar_pruebas.py` (51 pruebas).
+
 ## Descripción General
 
 **YPRI** es una plataforma integral orientada a conectar clientes con profesionales independientes y empresas de servicios técnicos para el hogar y comercio (electricidad, plomería, limpieza, climatización y cerrajería) en las principales ciudades de Colombia.

@@ -13,6 +13,11 @@ GUIA 8 - VECTORES EN PYTHON:
 - Busqueda reactiva por identificador y por multiples atributos
 - Cotizador de contratos con calculo de IVA (19%) en tiempo real
 - Sistema de calificaciones y metricas analiticas del vector
+GUIA 11 - ARCHIVOS, EXCEL Y POO:
+- Vista 'Archivos y Excel': exportar e importar Excel, guardar datos e historial
+- Publicar servicio crea un objeto Servicio (setters con validacion) y guarda en archivo
+- La tarjeta de usuario muestra describir_rol(), metodo sobrescrito en cada clase derivada
+- Al cerrar la ventana se guardan los datos en 'datos/ypri_datos.json'
 ========================================================================================
 """
 
@@ -49,6 +54,17 @@ from data.database import (
 from modules.servicios import (
     ordenar_servicios_ascendente,
     ordenar_servicios_descendente,
+    generar_codigo_servicio_libre,
+)
+from modules.geolocalizacion import CENTRO_CIUDAD, RADIO_COBERTURA_KM
+from models.servicio import Servicio
+from models.usuario import Usuario
+from modules.persistencia import guardar_datos, registrar_evento, leer_historial, RUTA_DATOS
+from modules.reportes_excel import (
+    exportar_reporte_excel,
+    importar_servicios_excel,
+    crear_plantilla_importacion,
+    RUTA_PLANTILLA,
 )
 from modules.matrices import (
     calcular_totales_filas,
@@ -86,7 +102,7 @@ class YpriApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("YPRI — Plataforma de Servicios a Domicilio")
-        self.geometry("1100x720")
+        self.geometry("1100x760")
         self.minsize(980, 640)
         self.configure(bg="#F1F5F9")
 
@@ -238,6 +254,7 @@ class YpriApp(tk.Tk):
             ("publicar", "Publicar Servicio", self._abrir_publicar),
             ("reto", "Análisis de Vectores", self._abrir_reto),
             ("admin", "Panel Administrador", self._abrir_admin),
+            ("archivos", "Archivos y Excel (Guía 11)", self._abrir_archivos),
         ]
 
         self.nav_frame = tk.Frame(self.sidebar, bg=self.c_sidebar)
@@ -254,7 +271,7 @@ class YpriApp(tk.Tk):
                 activeforeground="#FFFFFF",
                 bd=0,
                 padx=14,
-                pady=10,
+                pady=6,
                 anchor="w",
                 cursor="hand2",
                 command=comando,
@@ -295,8 +312,12 @@ class YpriApp(tk.Tk):
         u = get_sesion_actual()
         if u:
             self.lbl_user_name.config(text=u["nombre"])
-            rol_txt = f"Rol: {u['rol'].capitalize()} • {u['ciudad']}"
-            self.lbl_user_role.config(text=rol_txt)
+            # GUIA 11: describir_rol() esta sobrescrito en Cliente, Prestador y Administrador
+            try:
+                rol_txt = Usuario.desde_diccionario(u).describir_rol().split(":")[0]
+            except (ValueError, KeyError):
+                rol_txt = u["rol"].capitalize()
+            self.lbl_user_role.config(text=f"{rol_txt} • {u['ciudad']}")
         else:
             self.lbl_user_name.config(text="Sin Sesión")
             self.lbl_user_role.config(text="Invitado")
@@ -331,6 +352,8 @@ class YpriApp(tk.Tk):
             self._vista_reto_vectores()
         elif clave == "admin":
             self._vista_admin()
+        elif clave == "archivos":
+            self._vista_archivos()
 
     # Callbacks de navegacion
     def _abrir_catalogo(self): self.mostrar_vista("catalogo")
@@ -341,6 +364,7 @@ class YpriApp(tk.Tk):
     def _abrir_publicar(self): self.mostrar_vista("publicar")
     def _abrir_reto(self): self.mostrar_vista("reto")
     def _abrir_admin(self): self.mostrar_vista("admin")
+    def _abrir_archivos(self): self.mostrar_vista("archivos")
 
     # ====================================================================================
     # VISTA 1: CATALOGO, BUSQUEDA Y ORDENAMIENTO (GUIA 8)
@@ -1112,38 +1136,34 @@ class YpriApp(tk.Tk):
         chk.grid(row=4, column=1, sticky="w", padx=10, pady=6)
 
         def publicar():
-            try:
-                tarifa_val = float(ent_tarifa.get().strip())
-                if tarifa_val < 10000 or tarifa_val > 500000:
-                    messagebox.showerror("YPRI", "La tarifa debe estar entre $10.000 y $500.000 COP.")
-                    return
-            except ValueError:
-                messagebox.showerror("YPRI", "Ingrese un valor numérico válido para la tarifa.")
-                return
-
-            desc_val = ent_desc.get().strip()
-            if len(desc_val) < 10:
-                messagebox.showerror("YPRI", "La descripción debe tener al menos 10 caracteres.")
-                return
-
             u = get_sesion_actual()
-            nuevo_cod = f"SERV-{str(len(servicios) + 1).zfill(2)}"
+            nuevo_cod = generar_codigo_servicio_libre()
+            ciudad = combo_ciudad.get()
 
-            nuevo_serv = {
-                "codigo": nuevo_cod,
-                "prestador_id": u["id"],
-                "prestador_nombre": u["nombre"],
-                "categoria": combo_cat.get(),
-                "descripcion": desc_val,
-                "tarifa_hora": tarifa_val,
-                "ciudad": combo_ciudad.get(),
-                "disponible": var_disp.get(),
-                "calificacion": 5.0,
-                "num_contratos": 0
-            }
+            # GUIA 11: el objeto Servicio valida tarifa, descripcion, categoria y ciudad
+            # con sus setters; si algo esta mal, se muestra el mensaje del ValueError.
+            try:
+                objeto = Servicio(
+                    codigo=nuevo_cod,
+                    prestador_id=u["id"],
+                    prestador_nombre=u["nombre"],
+                    categoria=combo_cat.get(),
+                    descripcion=ent_desc.get(),
+                    tarifa_hora=ent_tarifa.get().strip(),
+                    ciudad=ciudad,
+                    lat=CENTRO_CIUDAD.get(ciudad, CENTRO_CIUDAD["Cucuta"])[0],
+                    lng=CENTRO_CIUDAD.get(ciudad, CENTRO_CIUDAD["Cucuta"])[1],
+                    radio_km=RADIO_COBERTURA_KM,
+                    disponible=var_disp.get(),
+                )
+            except ValueError as error:
+                messagebox.showerror("YPRI", str(error))
+                return
 
-            servicios.append(nuevo_serv)
-            messagebox.showinfo("YPRI", f"¡Servicio '{nuevo_cod}' registrado exitosamente en el vector!")
+            servicios.append(objeto.a_diccionario())
+            guardar_datos()
+            registrar_evento(f"Servicio publicado desde la GUI: {objeto.codigo} ({objeto.categoria})")
+            messagebox.showinfo("YPRI", f"¡Servicio publicado y guardado!\n\n{objeto}")
             self.mostrar_vista("catalogo")
 
         btn_guardar = tk.Button(
@@ -2254,12 +2274,128 @@ class YpriApp(tk.Tk):
         btn_reg = tk.Button(win, text="Registrar Usuario", font=("Segoe UI", 10, "bold"), bg=self.c_primary, fg="#FFFFFF", bd=0, pady=10, command=guardar)
         btn_reg.pack(fill="x", pady=16)
 
+    # ====================================================================================
+    # VISTA GUIA 11: ARCHIVOS, EXCEL E HISTORIAL
+    # ====================================================================================
+
+    def _vista_archivos(self):
+        """Exportar/importar Excel, guardar datos en archivo y ver el historial."""
+        from tkinter import filedialog
+
+        tk.Label(
+            self.content_area,
+            text="Archivos y reportes Excel",
+            font=("Segoe UI", 18, "bold"),
+            bg=self.c_bg,
+            fg=self.c_text,
+        ).pack(anchor="w")
+        tk.Label(
+            self.content_area,
+            text="Los datos se guardan en archivo y se recuperan al volver a abrir YPRI (Guía 11).",
+            font=("Segoe UI", 10),
+            bg=self.c_bg,
+            fg=self.c_muted,
+        ).pack(anchor="w", pady=(2, 14))
+
+        u = get_sesion_actual()
+        puede_importar = u is not None and u["rol"] in ("prestador", "admin")
+
+        acciones = tk.Frame(self.content_area, bg=self.c_bg)
+        acciones.pack(fill="x", pady=(0, 14))
+
+        def refrescar_historial():
+            lista_hist.delete(0, "end")
+            lineas = leer_historial(ultimas=50)
+            if not lineas:
+                lista_hist.insert("end", "Todavía no hay operaciones registradas.")
+            for linea in reversed(lineas):
+                lista_hist.insert("end", linea)
+
+        def exportar():
+            try:
+                ruta = exportar_reporte_excel()
+            except PermissionError:
+                messagebox.showerror("YPRI", "Cierre el archivo de Excel si lo tiene abierto e intente de nuevo.")
+                return
+            registrar_evento("Reporte Excel exportado desde la GUI")
+            refrescar_historial()
+            messagebox.showinfo("YPRI", f"Reporte exportado con 3 hojas:\n{ruta}")
+
+        def importar():
+            if not puede_importar:
+                messagebox.showwarning("YPRI", "Solo prestadores y administradores pueden importar servicios.")
+                return
+            if not os.path.exists(RUTA_PLANTILLA):
+                crear_plantilla_importacion()
+            ruta = filedialog.askopenfilename(
+                title="Elegir Excel de servicios",
+                initialdir=os.path.dirname(RUTA_PLANTILLA),
+                filetypes=[("Excel", "*.xlsx")],
+            )
+            if not ruta:
+                return
+            prestador_id = u["id"] if u["rol"] == "prestador" else "USR-IMPORT"
+            try:
+                resultado = importar_servicios_excel(ruta, prestador_id=prestador_id)
+            except (FileNotFoundError, ValueError) as error:
+                messagebox.showerror("YPRI", str(error))
+                return
+            if resultado["importados"]:
+                guardar_datos()
+                registrar_evento(f"Importados desde Excel (GUI): {', '.join(resultado['importados'])}")
+            refrescar_historial()
+            texto = f"Importados al catálogo: {len(resultado['importados'])}"
+            for fila, motivo in resultado["rechazados"]:
+                texto += f"\nFila {fila} rechazada: {motivo}"
+            messagebox.showinfo("YPRI", texto)
+
+        def guardar():
+            if guardar_datos():
+                registrar_evento("Respaldo manual desde la GUI")
+                refrescar_historial()
+                messagebox.showinfo("YPRI", f"Datos guardados en:\n{RUTA_DATOS}")
+
+        for texto, comando, color, color_texto in [
+            ("Exportar reporte Excel", exportar, self.c_primary, "#FFFFFF"),
+            ("Importar servicios desde Excel", importar, self.c_warning, "#FFFFFF"),
+            ("Guardar datos ahora", guardar, "#334155", "#FFFFFF"),
+        ]:
+            tk.Button(
+                acciones, text=texto, font=("Segoe UI", 10, "bold"), bg=color, fg=color_texto,
+                activebackground=self.c_primary_hover, activeforeground="#FFFFFF",
+                bd=0, padx=16, pady=10, cursor="hand2", command=comando,
+            ).pack(side="left", padx=(0, 10))
+
+        resumen = tk.Frame(self.content_area, bg=self.c_card, padx=16, pady=12, bd=1, relief="solid")
+        resumen.pack(fill="x", pady=(0, 14))
+        for titulo, valor in [
+            ("Archivo de datos", os.path.relpath(RUTA_DATOS, os.path.dirname(os.path.abspath(__file__)))),
+            ("Servicios en el catálogo", str(len(servicios))),
+            ("Contratos registrados", str(len(contratos))),
+        ]:
+            fila = tk.Frame(resumen, bg=self.c_card)
+            fila.pack(fill="x", pady=2)
+            tk.Label(fila, text=titulo, width=24, anchor="w", font=("Segoe UI", 9, "bold"),
+                     bg=self.c_card, fg=self.c_muted).pack(side="left")
+            tk.Label(fila, text=valor, font=("Segoe UI", 10), bg=self.c_card, fg=self.c_text).pack(side="left")
+
+        tk.Label(self.content_area, text="Historial de operaciones (archivo de texto):",
+                 font=("Segoe UI", 11, "bold"), bg=self.c_bg, fg=self.c_text).pack(anchor="w", pady=(0, 4))
+        lista_hist = tk.Listbox(self.content_area, font=("Consolas", 9), bd=1, relief="solid",
+                                bg="#FFFFFF", fg=self.c_text, highlightthickness=0)
+        lista_hist.pack(fill="both", expand=True)
+        refrescar_historial()
+
 
 def main_gui():
-    """Lanzador de la aplicacion grafica."""
+    """Lanzador de la aplicacion grafica. Al cerrar la ventana guarda los datos (Guia 11)."""
     app = YpriApp()
     app.mainloop()
+    guardar_datos()
 
 
 if __name__ == "__main__":
+    # Ejecucion directa de la GUI: primero se recuperan los datos guardados en archivo
+    from modules.persistencia import cargar_datos
+    cargar_datos()
     main_gui()

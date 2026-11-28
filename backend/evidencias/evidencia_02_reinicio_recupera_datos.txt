@@ -1,0 +1,192 @@
+[i] Datos recuperados desde datos\ypri_datos.json
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              BIENVENIDO A YPRI
+========================================================================
+
+  1. Iniciar sesion (Modo Consola)
+  2. Registrarse como nuevo usuario
+  3. Matrices de facturacion y demanda de YPRI (Guia 9)
+  4. Subalgoritmos y cotizador de YPRI (Guia 10)
+  5. Abrir Interfaz Grafica de Escritorio (Tkinter)
+  0. Salir
+------------------------------------------------------------------------
+  Seleccione una opcion (0-5): 1
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              INICIAR SESION
+========================================================================
+
+  Correo electronico: carlos.gomez@email.com
+  Contrasena: carlos456
+
+[OK] Bienvenido/a, Carlos Gomez!
+     Prestador: publica servicios y atiende contratos | Ciudad: Cucuta
+     Puede: publicar servicios, modificar servicios, exportar a Excel
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              MENU PRESTADOR — Carlos Gomez
+========================================================================
+
+  1. Ver catalogo de servicios en mi ciudad
+  2. Publicar nuevo servicio
+  3. Modificar un servicio propio
+  4. Ver contratos asociados
+  5. Actualizar estado de contrato
+  6. Explorar Matrices de Facturacion (Guia 9)
+  7. Tarjeta de Rendimiento Operativo y Comisiones (Guia 10)
+  8. Eliminar un servicio propio
+  9. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-9): 1
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              CATALOGO DE SERVICIOS YPRI
+========================================================================
+
+  Filtro por ciudad: Cucuta
+
+No. Codigo    Prestador           Categoria           Tarifa/h  Disp.  Rating
+------------------------------------------------------------------------
+1   SERV-01   Carlos Gomez        Electricidad    $    35,000  Si     4.8*
+2   SERV-02   Marta Rodriguez     Plomeria        $    30,000  Si     4.5*
+3   SERV-03   Andres Silva        Climatizacion   $    45,000  No     5.0*
+4   SERV-04   Jorge Mendoza       Cerrajeria      $    38,000  Si     4.7*
+5   SERV-05   Sandra Rios         Limpieza        $    25,000  Si     4.3*
+6   SERV-07   Valentina Ruiz      Belleza         $    30,000  Si     4.9*
+7   SERV-20   Luis Ortega         Electricidad    $    40,000  Si     4.6*
+8   SERV-21   Diana Paez          Plomeria        $    32,000  Si     4.4*
+------------------------------------------------------------------------
+Servicios mostrados: 8 de 8 en la vista actual.
+
+  Presione Enter para continuar...
+
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              MENU PRESTADOR — Carlos Gomez
+========================================================================
+
+  1. Ver catalogo de servicios en mi ciudad
+  2. Publicar nuevo servicio
+  3. Modificar un servicio propio
+  4. Ver contratos asociados
+  5. Actualizar estado de contrato
+  6. Explorar Matrices de Facturacion (Guia 9)
+  7. Tarjeta de Rendimiento Operativo y Comisiones (Guia 10)
+  8. Eliminar un servicio propio
+  9. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-9): 2
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              PUBLICAR NUEVO SERVICIO
+========================================================================
+
+  Categorias disponibles: Electricidad, Plomeria, Limpieza, Climatizacion, Cerrajeria, Belleza
+  Categoria: Electricidad
+  Descripcion del servicio: Mantenimiento preventivo de redes electricas
+  Tarifa por hora en COP: 5000
+[!] El valor debe estar entre 10000 y 500000.
+  Tarifa por hora en COP: 42000
+  Ciudades disponibles: Cucuta, Cali, Bogota, Medellin, Bucaramanga
+  Ciudad: Cucuta
+  ¿Disponibilidad inmediata? (s/n): s
+
+[OK] Servicio publicado exitosamente:
+     SERV-09 | Electricidad  | Carlos Gomez       | $42,000/h | 5.0* | Disponible
+     Total de servicios en el vector YPRI: 9
+
+  Presione Enter para continuar...
+
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              MENU PRESTADOR — Carlos Gomez
+========================================================================
+
+  1. Ver catalogo de servicios en mi ciudad
+  2. Publicar nuevo servicio
+  3. Modificar un servicio propio
+  4. Ver contratos asociados
+  5. Actualizar estado de contrato
+  6. Explorar Matrices de Facturacion (Guia 9)
+  7. Tarjeta de Rendimiento Operativo y Comisiones (Guia 10)
+  8. Eliminar un servicio propio
+  9. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-9): 9
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              ARCHIVOS Y REPORTES EXCEL (Guia 11)
+========================================================================
+
+  1. Exportar reporte a Excel (servicios, contratos y facturacion)
+  2. Importar servicios desde un archivo Excel
+  3. Guardar ahora los datos en archivo
+  4. Ver historial de operaciones guardado
+  0. Volver
+------------------------------------------------------------------------
+  Seleccione una opcion (0-4): 4
+  Ultimas 7 operaciones (historial_operaciones.txt):
+   27/11/2026 18:39:24 | Inicio de sesion: USR-003 | Admin YPRI | admin | admin@ypri.com
+   27/11/2026 18:39:24 | Reporte Excel exportado: reporte_ypri.xlsx
+   27/11/2026 18:39:24 | Importados desde Excel: SERV-20, SERV-21, SERV-22
+   27/11/2026 18:39:24 | Servicio eliminado: SERV-22
+   27/11/2026 18:39:24 | Cierre de sesion: admin@ypri.com
+   27/11/2026 18:39:25 | Inicio de sesion: USR-002 | Carlos Gomez | prestador | carlos.gomez@email.com
+   27/11/2026 18:39:25 | Servicio publicado: SERV-09 (Electricidad)
+
+  Presione Enter para continuar...
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              ARCHIVOS Y REPORTES EXCEL (Guia 11)
+========================================================================
+
+  1. Exportar reporte a Excel (servicios, contratos y facturacion)
+  2. Importar servicios desde un archivo Excel
+  3. Guardar ahora los datos en archivo
+  4. Ver historial de operaciones guardado
+  0. Volver
+------------------------------------------------------------------------
+  Seleccione una opcion (0-4): 0
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              MENU PRESTADOR — Carlos Gomez
+========================================================================
+
+  1. Ver catalogo de servicios en mi ciudad
+  2. Publicar nuevo servicio
+  3. Modificar un servicio propio
+  4. Ver contratos asociados
+  5. Actualizar estado de contrato
+  6. Explorar Matrices de Facturacion (Guia 9)
+  7. Tarjeta de Rendimiento Operativo y Comisiones (Guia 10)
+  8. Eliminar un servicio propio
+  9. Archivos y reportes Excel: exportar, importar, respaldo (Guia 11)
+  0. Cerrar sesion
+------------------------------------------------------------------------
+  Seleccione una opcion (0-9): 0
+
+[i] Sesion cerrada exitosamente.
+
+========================================================================
+           YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO
+              BIENVENIDO A YPRI
+========================================================================
+
+  1. Iniciar sesion (Modo Consola)
+  2. Registrarse como nuevo usuario
+  3. Matrices de facturacion y demanda de YPRI (Guia 9)
+  4. Subalgoritmos y cotizador de YPRI (Guia 10)
+  5. Abrir Interfaz Grafica de Escritorio (Tkinter)
+  0. Salir
+------------------------------------------------------------------------
+  Seleccione una opcion (0-5): 0
+
+  [OK] Datos guardados en datos\ypri_datos.json
+
+  Gracias por utilizar YPRI.
+  Conectando hogares con profesionales de confianza.
+
