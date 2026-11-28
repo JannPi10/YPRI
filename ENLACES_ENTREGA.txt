@@ -1,0 +1,27 @@
+YPRI - PLATAFORMA DE SERVICIOS A DOMICILIO «TALENTO AL TOQUE»
+Proyecto final - Diseño Funcional (Unidades 1, 2 y 3)
+Estudiantes: Jann Pierre Ortiz Zambrano y Josué David Rincón Palomino
+Docente: Robinson Damián Gómez Sánchez
+Fundación de Estudios Superiores Comfanorte - Ingeniería de Software - Cúcuta, noviembre de 2026
+
+ENLACES
+-------
+Carpeta de Google Drive con la entrega (proyecto .zip, documentación DOCX y PDF):
+https://drive.google.com/drive/folders/168KfrDuKjVr8hk1zk5V0eh8WYkKMex6i
+
+Carpeta de Google Drive de la Guía 11:
+https://drive.google.com/drive/folders/1xy0gqDMrNE-Gj3JugeikjGmnbuwUhUVh
+
+Repositorio de GitHub:
+https://github.com/JannPi10/YPRI
+
+CONTENIDO DE LA ENTREGA
+-----------------------
+- Proyecto_Final_YPRI.zip: carpeta completa del proyecto (YPRI/).
+- YPRI/DOCUMENTACION_TECNICA.md: documentación técnica en español e inglés (carpeta raíz).
+- YPRI/docs/DOCUMENTACION_TECNICA.docx y .pdf: la misma documentación con formato FESC y normas APA.
+- YPRI/requirements.txt: dependencias (pip install -r requirements.txt).
+- YPRI/backend/: aplicativo en Python (python main.py) y pruebas (python ejecutar_pruebas.py).
+- YPRI/backend/datos/ y YPRI/backend/reportes/: archivos de datos y Excel.
+- YPRI/backend/evidencias/: evidencias de funcionamiento.
+- YPRI/web/: versión web «Talento al toque».
